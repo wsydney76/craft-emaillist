@@ -45,10 +45,34 @@ class EmaillistService extends Component
 
 
     public function unregister(string $email, string $verificationCode)
-    {;
+    {
+        ;
         $record = EmaillistRecord::findOne(['email' => $email, 'verificationCode' => $verificationCode]);
         if ($record) {
             $record->delete();
         }
+    }
+
+    public function deleteByIds(array $ids)
+    {
+        EmaillistRecord::deleteAll(['in', 'id', $ids]);
+    }
+
+    public function create(string $email): array
+    {
+        $record = new EmaillistRecord([
+            'email' => $email
+        ]);
+
+        $record->save();
+
+        return $record->hasErrors() ? [
+            'success' => false,
+            'message' => $record->getFirstError('email')
+        ] :
+            [
+                'success' => true,
+                'message' => 'Email created'
+            ];
     }
 }

@@ -4,7 +4,15 @@
     email: '',
     success: true,
     message: '{{ 'Enter email and press enter'|t('emaillist') }}',
+    confirmed: false,
     async register() {
+
+        if(!this.confirmed) {
+            this.message = '{{'No confirmation'}}'
+            this.success = false
+            return
+        }
+
         email = this.email
         response = await fetch('{{ currentSite.baseUrl }}/emaillist/register/?email=' + this.email,  {
             headers: {
@@ -28,7 +36,10 @@
         }
     }) }}
 
-    <div x-text="message" class="mt-2"  :class="success ? '' : 'bg-warning p-2 text-white rounded'">
-
+    <div>
+        <input id="emaillist-confirmation" type="checkbox" x-model="confirmed">
+        <label for="emaillist-confirmation">{{ 'Confirm privacy'|t('emaillist') }}</label>
     </div>
+
+    <div x-text="message" class="mt-2"  :class="success ? '' : 'bg-warning p-2 text-white rounded'"></div>
 </div>

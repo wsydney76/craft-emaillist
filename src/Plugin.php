@@ -3,6 +3,7 @@
 namespace wsydney76\emaillist;
 
 use Craft;
+use function array_merge;
 use craft\base\Model;
 use craft\base\Plugin as BasePlugin;
 use craft\events\RegisterComponentTypesEvent;
@@ -13,9 +14,9 @@ use craft\web\UrlManager;
 use craft\web\View;
 use wsydney76\emaillist\models\Settings;
 use wsydney76\emaillist\services\EmaillistService;
+use wsydney76\emaillist\utilities\EmaillistUtility;
 use wsydney76\emaillist\utilities\RegisterEmailUtility;
 use yii\base\Event;
-use function array_merge;
 
 /**
  * Register Email plugin
@@ -73,5 +74,8 @@ class Plugin extends BasePlugin
                 ]);
             }
         );
+        Event::on(Utilities::class, Utilities::EVENT_REGISTER_UTILITY_TYPES, function (RegisterComponentTypesEvent $event) {
+            $event->types[] = EmaillistUtility::class;
+        });
     }
 }

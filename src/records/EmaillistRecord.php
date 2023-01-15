@@ -25,7 +25,7 @@ class EmaillistRecord extends ActiveRecord
         return [
             ['email', 'required'],
             ['email', 'filter', 'filter' =>  [$this, 'normalizeEmail']],
-            ['email', 'email'],
+            ['email', 'email', 'message' => Craft::t('emaillist', 'This is not a valid email address!')],
             ['email', 'unique'],
             ['verificationCode', 'string', 'max' => 100]
         ];

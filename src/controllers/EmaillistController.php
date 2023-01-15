@@ -5,6 +5,7 @@ namespace wsydney76\emaillist\controllers;
 use Craft;
 use craft\web\Controller;
 use craft\web\View;
+use wsydney76\emaillist\events\EmaillistRegisterEvent;
 use wsydney76\emaillist\Plugin;
 use wsydney76\emaillist\services\EmaillistService;
 use yii\web\Response;
@@ -18,6 +19,7 @@ class EmaillistController extends Controller
     protected array|int|bool $allowAnonymous = self::ALLOW_ANONYMOUS_LIVE;
     protected EmaillistService $service;
 
+    public const EVENT_EMAILLIST_REGISTER = 'eventEmaillistRegister';
 
     public function beforeAction($action): bool
     {
@@ -39,6 +41,23 @@ class EmaillistController extends Controller
         $this->requireAcceptsJson();
 
         $email = Craft::$app->request->getRequiredQueryParam('email');
+
+        if($this->hasEventHandlers(self::EVENT_EMAILLIST_REGISTER)) {
+            $event = new EmaillistRegisterEvent([
+                'request' => $this->request,
+                'email' => $email
+            ]);
+            $this->trigger(self::EVENT_EMAILLIST_REGISTER, $event);
+            if ($event->handled) {
+                return $this->asJson([
+                    'success' => true,
+                    'message' => 'no',
+                    'email' => $email
+                ]);
+            }
+        }
+
+
 
         $model = $this->service->createEmaillistEntry($email);
 
@@ -68,6 +87,35 @@ class EmaillistController extends Controller
             'title' => 'Cancel',
             'text' => Craft::t('emaillist', 'Your email is removed from the list.'),
         ], View::TEMPLATE_MODE_SITE);
+    }
+
+    public function actionCreate()
+    {
+        $this->requirePermission('utility:emaillist-utility');
+
+        $email = Craft::$app->request->getRequiredBodyParam('email');
+
+        $result = $this->service->create($email);
+
+        return $result['success'] ?
+            $this->asSuccess($result['message']) :
+            $this->asFailure($result['message']);
+
+    }
+
+    public function actionDelete()
+    {
+        $this->requirePermission('utility:emaillist-utility');
+
+        $ids = Craft::$app->request->getBodyParam('delete', []);
+
+        if (!$ids) {
+            return $this->asFailure('Nothing selected.');
+        }
+
+        $this->service->deleteByIds($ids);
+
+        return $this->asSuccess('Selected emails deleted.');
     }
 
 }
