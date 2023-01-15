@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>{{ siteInfo.siteName }}</title>
+    <style>
+        body {
+            background-color: rgb(228, 237, 246);
+            font-family: system-ui,BlinkMacSystemFont,-apple-system,Segoe UI,Roboto,Oxygen,Ubuntu,Cantarell,Fira Sans,Droid Sans,Helvetica Neue,sans-serif;
+            font-size: 1rem;
+        }
+        .message-title {
+            font-weight: bold;
+        }
+
+        .message-wrapper {
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .message {
+            background-color: white;
+            border-radius: 8px;
+            padding: 24px;
+            box-shadow: 0 25px 100px rgb(31 41 51 / 50%);
+        }
+
+        .message .message-text {
+            margin-top: 12px;
+            font-size: 0.875rem;
+        }
+
+    </style>
+</head>
+<body>
+<div class="message-wrapper">
+    <div class="message">
+        <div class="message-title">{{ title }}</div>
+        <div class="message-text">
+            {{ text }}
+        </div>
+    </div>
+</div>
+
+</body>
+</html>

@@ -1,0 +1,43 @@
+{
+    "name": "wsydney76/emaillist",
+    "description": "Let users register their email (e.g. for a newsletter)",
+    "type": "craft-plugin",
+    "license": "mit",
+    "support": {
+        "email": "wsydney@web.de",
+        "issues": "https://github.com/https//github.com/wsydney76/craft-register-email/issues?state=open",
+        "source": "https://github.com/https//github.com/wsydney76/craft-register-email",
+        "docs": "https://github.com/https//github.com/wsydney76/craft-register-email",
+        "rss": "https://github.com/https//github.com/wsydney76/craft-register-email/releases.atom"
+    },
+    "require": {
+        "php": ">=8.0.2",
+        "craftcms/cms": "^4.3.5"
+    },
+    "require-dev": {
+        "craftcms/ecs": null,
+        "craftcms/phpstan": null
+    },
+    "autoload": {
+        "psr-4": {
+            "wsydney76\\emaillist\\": "src/"
+        }
+    },
+    "extra": {
+        "handle": "emaillist",
+        "name": "Email List",
+        "developer": "wsydney76",
+        "documentationUrl": "https://github.com/https//github.com/wsydney76/emaillist"
+    },
+    "config": {
+        "sort-packages": true,
+        "platform": {
+            "php": "8.0.2"
+        },
+        "allow-plugins": {
+            "yiisoft/yii2-composer": true,
+            "craftcms/plugin-installer": true
+        }
+    }
+}
+

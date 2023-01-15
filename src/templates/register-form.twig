@@ -1,0 +1,34 @@
+{% import '_macros/forms.twig' as forms %}
+
+<div x-data="{
+    email: '',
+    success: true,
+    message: '{{ 'Enter email and press enter'|t('emaillist') }}',
+    async register() {
+        email = this.email
+        response = await fetch('{{ currentSite.baseUrl }}/emaillist/register/?email=' + this.email,  {
+            headers: {
+                'Accept': 'application/json'
+            }
+        })
+        data = await response.json()
+        console.log(data)
+        this.message = data.message
+        this.success = data.success
+        this.email = data.email
+    }
+}" style="width: 300px">
+    {{ forms.input({
+        label: 'Register Email'|t('emaillist'),
+        name: 'email',
+        value: '',
+        extraAttr: {
+            'x-model': 'email',
+            '@keyup.enter': 'register()'
+        }
+    }) }}
+
+    <div x-text="message" class="mt-2"  :class="success ? '' : 'bg-warning p-2 text-white rounded'">
+
+    </div>
+</div>
