@@ -1,0 +1,97 @@
+{% import '_macros/forms.twig' as forms %}
+
+{% set btnColor = btnColor ?? 'primary' %}
+{% set confirmPrivacy = confirmPrivacy is defined ? confirmPrivacy : true %}
+{% set list = list ?? 'default' %}
+
+<div x-data="{
+    email: '',
+    list: '{{ list }}',
+    baseUrl: '{{ currentSite.baseUrl }}',
+    success: true,
+    message: '',
+    confirmPrivacy: {{ confirmPrivacy ? 'true' : 'false' }},
+    confirmed: false,
+    timeoutId: '',
+    btnColor: '{{ btnColor }}',
+
+    async register() {
+
+        if(this.confirmPrivacy && !this.confirmed) {
+            this.setMessage({message: '{{'Please confirm'|t('emaillist')}}', success: false})
+            return
+        }
+
+        email = this.email
+        response = await fetch(this.getUrl(),  {
+            headers: {
+                'Accept': 'application/json'
+            }
+        })
+        data = await response.json()
+        console.log(data)
+
+        this.setMessage(data)
+
+        this.email = data.success ? '' : data.email
+    },
+
+    setMessage(msg) {
+
+        this.message = msg.message
+        this.success = msg.success
+        if (this.timeoutId) {
+            clearTimeout(this.timeoutId)
+        }
+        this.timeoutId = setTimeout(() => {
+            this.message = ''
+        }, 3000)
+    },
+    getUrl() {
+        return `${this.baseUrl}/emaillist/register/?email=${this.email}&list=${this.list}`
+    }
+}" style="width: 300px">
+
+    {% block content %}
+        <div class="mb-2">
+            {{ 'Register Email'|t('emaillist') }}
+        </div>
+    {% endblock %}
+
+    <div class="relative">
+
+        <div class="flex">
+            {{ forms.input({
+                name: 'email',
+                value: '',
+                extraAttr: {
+                    'x-model': 'email',
+                    '@keyup.enter': 'register()',
+                    'class': 'rounded-r-none content-border',
+                }
+            }) }}
+
+            {{ include('_layouts/partials/button.twig', {
+                tag: 'button',
+                type: 'button',
+                color: btnColor,
+                caption: 'Register'|t('emaillist'),
+                xOnClick: 'register()',
+                extraClasses: 'rounded-l-none my-px'
+            }) }}
+
+        </div>
+
+        <div x-show="confirmPrivacy" class="mt-2">
+            <input id="emaillist-confirmation" type="checkbox" x-model="confirmed">
+            <label for="emaillist-confirmation">{{ 'Confirm privacy'|t('emaillist') }}</label>
+        </div>
+
+        <div x-show="message"
+             x-text="message"
+             x-transition
+             class="absolute mt-1.5 ml-1.5 top-0 p-2 text-white rounded"
+             :class="success ? 'bg-green-700' : 'bg-warning '">
+        </div>
+    </div>
+</div>

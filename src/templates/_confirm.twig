@@ -1,0 +1,21 @@
+{# @var record \wsydney76\emaillist\records\EmaillistRecord #}
+{# @var site \Craft\models\Site #}
+
+<p>
+    PLACEHODER TEXT.
+</p>
+
+<p>
+    {{ 'In order to unregister your email, click here'|t('emaillist', [], site.language) }}:
+</p>
+
+<p>
+    <a href="{{ siteUrl('emaillist/unregister', {
+        email: record.email,
+        list: record.list,
+        verificationCode: record.verificationCode
+    }, null, site.id) }}">
+        {{ 'Unregister'|t('emaillist', [], site.language) }}
+    </a>
+
+</p>

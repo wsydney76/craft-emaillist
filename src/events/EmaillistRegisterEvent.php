@@ -9,4 +9,5 @@ class EmaillistRegisterEvent extends Event
 {
     public Request $request;
     public string $email;
+    public string $list;
 }

@@ -7,8 +7,11 @@ use craft\web\Controller;
 use craft\web\View;
 use wsydney76\emaillist\events\EmaillistRegisterEvent;
 use wsydney76\emaillist\Plugin;
+use wsydney76\emaillist\records\EmaillistRecord;
 use wsydney76\emaillist\services\EmaillistService;
 use yii\web\Response;
+use function str_getcsv;
+use const PHP_EOL;
 
 /**
  * Register Email controller
@@ -41,11 +44,14 @@ class EmaillistController extends Controller
         $this->requireAcceptsJson();
 
         $email = Craft::$app->request->getRequiredQueryParam('email');
+        $list = Craft::$app->request->getQueryParam('list', 'default');
 
-        if($this->hasEventHandlers(self::EVENT_EMAILLIST_REGISTER)) {
+
+        if ($this->hasEventHandlers(self::EVENT_EMAILLIST_REGISTER)) {
             $event = new EmaillistRegisterEvent([
                 'request' => $this->request,
-                'email' => $email
+                'email' => $email,
+                'list' => $list
             ]);
             $this->trigger(self::EVENT_EMAILLIST_REGISTER, $event);
             if ($event->handled) {
@@ -57,22 +63,23 @@ class EmaillistController extends Controller
             }
         }
 
+        $record = $this->service->createEmaillistEntry($email, $list, Craft::$app->sites->currentSite->handle);
 
-
-        $model = $this->service->createEmaillistEntry($email);
-
-        if ($model->hasErrors()) {
+        if ($record->hasErrors()) {
             return $this->asJson([
                 'success' => false,
-                'message' => $model->getFirstError('email'),
-                'email' => $model->email
+                'message' => $record->getFirstError('email'),
+                'email' => $record->email
             ]);
         }
 
         return $this->asJson([
             'success' => true,
-            'message' => Craft::t('emaillist', 'Email registered.'),
-            'email' => $model->email
+            'message' => Craft::t(
+                'emaillist',
+                'Email {email} registered.',
+                ['email' => $record->email]),
+            'email' => $record->email
         ]);
     }
 
@@ -80,11 +87,12 @@ class EmaillistController extends Controller
     {
         $email = Craft::$app->request->getRequiredQueryParam('email');
         $verificationCode = Craft::$app->request->getRequiredQueryParam('verificationCode');
+        $list = Craft::$app->request->getRequiredQueryParam('list');
 
-        $this->service->unregister($email, $verificationCode);
+        $this->service->unregister($email, $list, $verificationCode);
 
-        return Craft::$app->view->renderPageTemplate('@emaillist/wrapper.twig', [
-            'title' => 'Cancel',
+        return Craft::$app->view->renderPageTemplate('emaillist/_wrapper.twig', [
+            'title' => Craft::t('emaillist', 'Unregister'),
             'text' => Craft::t('emaillist', 'Your email is removed from the list.'),
         ], View::TEMPLATE_MODE_SITE);
     }
@@ -94,12 +102,22 @@ class EmaillistController extends Controller
         $this->requirePermission('utility:emaillist-utility');
 
         $email = Craft::$app->request->getRequiredBodyParam('email');
+        $list = Craft::$app->request->getRequiredBodyParam('list');
+        $site = Craft::$app->request->getRequiredBodyParam('site');
 
-        $result = $this->service->create($email);
+        $record = new EmaillistRecord([
+            'email' => $email,
+            'list' => $list ?? 'default',
+            'site' => $site
+        ]);
 
-        return $result['success'] ?
-            $this->asSuccess($result['message']) :
-            $this->asFailure($result['message']);
+        $record->save();
+
+        if ($record->hasErrors()) {
+            return $this->asModelFailure($record, 'Could not register email', 'emaillistRecord');
+        }
+
+        return  $this->asModelSuccess($record, 'Email registered.', 'emaillistRecord');
 
     }
 
@@ -116,6 +134,20 @@ class EmaillistController extends Controller
         $this->service->deleteByIds($ids);
 
         return $this->asSuccess('Selected emails deleted.');
+    }
+
+    public function actionExport()
+    {
+        $this->requirePermission('utility:emaillist-utility');
+        $emails = EmaillistRecord::find()->orderBy('email')->collect();
+
+        if (!$emails->count()) {
+            return $this->asFailure('Nothing found.');
+        }
+
+        $csvOutput = $this->service->createCsvOutput($emails);
+
+        return $this->response->sendContentAsFile($csvOutput, 'emails.csv', []);
     }
 
 }

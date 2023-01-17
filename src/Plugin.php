@@ -3,6 +3,8 @@
 namespace wsydney76\emaillist;
 
 use Craft;
+use craft\services\Gc;
+use wsydney76\emaillist\records\EmaillistRecord;
 use function array_merge;
 use craft\base\Model;
 use craft\base\Plugin as BasePlugin;
@@ -31,7 +33,7 @@ use yii\base\Event;
 class Plugin extends BasePlugin
 {
     public string $schemaVersion = '1.0.0';
-    public bool $hasCpSettings = false;
+    public bool $hasCpSettings = true;
 
     public static function config(): array
     {
@@ -51,16 +53,37 @@ class Plugin extends BasePlugin
         });
     }
 
+    protected function createSettingsModel(): ?Settings
+    {
+        return new Settings();
+    }
+
+    protected function settingsHtml(): ?string
+    {
+        return Craft::$app->view->renderTemplate('emaillist/_settings.twig', [
+            'settings' => $this->getSettings()
+        ]);
+    }
+
     private function attachEventHandlers(): void
     {
         // Register event handlers here ...
         // (see https://craftcms.com/docs/4.x/extend/events.html to get started)
 
         Event::on(
+            Gc::class,
+            Gc::EVENT_RUN,
+            function() {
+                Craft::$app->gc->hardDelete(EmaillistRecord::tableName());
+            }
+        );
+
+
+        Event::on(
             View::class,
             View::EVENT_REGISTER_SITE_TEMPLATE_ROOTS,
             function(RegisterTemplateRootsEvent $event) {
-                $event->roots['@emaillist'] = $this->getBasePath() . '/templates';
+                $event->roots['emaillist'] = $this->getBasePath() . '/templates';
             }
         );
 

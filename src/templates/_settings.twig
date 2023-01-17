@@ -1,0 +1,9 @@
+{% import '_includes/forms' as forms %}
+
+{{ forms.lightswitchField({
+    label: 'Send confirmation mail',
+    name: 'sendNotification',
+    on: settings.sendNotification,
+    instructions: 'Whether to send a confirmation mail to an email when it is first registered.',
+    first: true
+}) }}

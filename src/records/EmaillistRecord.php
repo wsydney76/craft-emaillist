@@ -4,6 +4,7 @@ namespace wsydney76\emaillist\records;
 
 use Craft;
 use craft\db\ActiveRecord;
+use craft\db\SoftDeleteTrait;
 use craft\helpers\DateTimeHelper;
 use craft\helpers\StringHelper;
 use function str_replace;
@@ -12,9 +13,12 @@ use function strtolower;
 /**
  * @property string $email
  * @property string $verificationCode
+ * @property string $site
  */
 class EmaillistRecord extends ActiveRecord
 {
+    use SoftDeleteTrait;
+
     public static function tableName()
     {
         return '{{%emaillist_registrations}}';
@@ -23,10 +27,11 @@ class EmaillistRecord extends ActiveRecord
     public function rules()
     {
         return [
-            ['email', 'required'],
+            [['email', 'list', 'site'], 'required'],
             ['email', 'filter', 'filter' =>  [$this, 'normalizeEmail']],
             ['email', 'email', 'message' => Craft::t('emaillist', 'This is not a valid email address!')],
-            ['email', 'unique'],
+            [['email','list'], 'unique', 'targetAttribute' => ['email', 'list']],
+            ['list', 'string', 'max' => 25],
             ['verificationCode', 'string', 'max' => 100]
         ];
     }
