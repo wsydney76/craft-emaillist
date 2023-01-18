@@ -10,8 +10,6 @@ use wsydney76\emaillist\Plugin;
 use wsydney76\emaillist\records\EmaillistRecord;
 use wsydney76\emaillist\services\EmaillistService;
 use yii\web\Response;
-use function str_getcsv;
-use const PHP_EOL;
 
 /**
  * Register Email controller
@@ -140,7 +138,9 @@ class EmaillistController extends Controller
     {
         $this->requirePermission('utility:emaillist-utility');
 
-        $emails = EmaillistRecord::find()->orderBy('email')->collect();
+        $emails = EmaillistRecord::find()
+            ->orderBy('email')
+            ->collect();
 
         if (!$emails->count()) {
             return $this->asFailure('Nothing found.');

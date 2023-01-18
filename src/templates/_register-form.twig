@@ -15,12 +15,11 @@
     confirmPrivacy: {{ confirmPrivacy ? 'true' : 'false' }},
     confirmed: false,
     timeoutId: '',
-    btnColor: '{{ btnColor }}',
 
     async register() {
 
         if(this.confirmPrivacy && !this.confirmed) {
-            this.setMessage({message: '{{'Please accept privacy policy'|t('emaillist')}}', success: false})
+            this.setMessage({message: '{{ 'Please accept privacy policy'|t('emaillist') }}', success: false})
             return
         }
 
@@ -30,6 +29,13 @@
                 'Accept': 'application/json'
             }
         })
+
+         // http error code > 200
+        if (!response.ok) {
+            this.handleError(response)
+            return
+        }
+
         data = await response.json()
         console.log(data)
 
@@ -49,9 +55,33 @@
             this.message = ''
         }, 3000)
     },
+
+    async handleError(response) {
+        const errorText = await response.text();
+        if (this.isJson(errorText)) {
+            // from exception
+            errorData = JSON.parse(errorText)
+            alert(`Error! status: ${response.status} message: ${errorData.message}`)
+        } else {
+            // from ->asFailure($message)
+            alert(`Error! status: ${response.status} message: ${errorText}`)
+        }
+    },
+
+    isJson(str) {
+        try {
+            JSON.parse(str);
+        } catch (e) {
+            return false;
+        }
+        return true;
+    },
+
     getUrl() {
         return `${this.baseUrl}/emaillist/register/?email=${this.email}&list=${this.list}`
-    }
+    },
+
+
 }">
 
     {% block content %}
@@ -62,44 +92,50 @@
 
     <div class="relative">
 
-        <div class="flex">
-            {{ forms.input({
-                name: 'email',
-                value: '',
-                extraAttr: {
-                    'x-model': 'email',
-                    '@keyup.enter': 'register()',
-                    'class': 'rounded-r-none content-border',
-                }
-            }) }}
+        {% block inputs %}
+            <div class="flex">
+                {{ forms.input({
+                    name: 'email',
+                    value: '',
+                    extraAttr: {
+                        'x-model': 'email',
+                        '@keyup.enter': 'register()',
+                        'class': 'rounded-r-none content-border',
+                    }
+                }) }}
 
-            {{ include('_layouts/partials/button.twig', {
-                tag: 'button',
-                type: 'button',
-                color: btnColor,
-                caption: 'Register'|t('emaillist'),
-                xOnClick: 'register()',
-                extraClasses: 'rounded-l-none my-px'
-            }) }}
+                {{ include('_layouts/partials/button.twig', {
+                    tag: 'button',
+                    type: 'button',
+                    color: btnColor,
+                    caption: 'Register'|t('emaillist'),
+                    xOnClick: 'register()',
+                    extraClasses: 'rounded-l-none my-px'
+                }) }}
 
-        </div>
+            </div>
+        {% endblock %}
 
-        <div x-show="confirmPrivacy" class="mt-2">
-            <input id="emaillist-confirmation" type="checkbox" x-model="confirmed">
-            <label for="emaillist-confirmation">
-                {{ 'Accept privacy policy'|t('emaillist') }}
-                {% if privacyLink %}
-                    <br>
-                    <a href="{{ privacyLink }}" class="underline" target="_blank">{{ 'Read here'|t('emaillist') }}</a>
-                {% endif %}
-            </label>
-        </div>
+       {% block privacy %}
+           <div x-show="confirmPrivacy" class="mt-2">
+               <input id="emaillist-confirmation" type="checkbox" x-model="confirmed">
+               <label for="emaillist-confirmation">
+                   {{ 'Accept privacy policy'|t('emaillist') }}
+                   {% if privacyLink %}
+                       <br>
+                       <a href="{{ privacyLink }}" class="underline" target="_blank">{{ 'Read here'|t('emaillist') }}</a>
+                   {% endif %}
+               </label>
+           </div>
+       {% endblock %}
 
-        <div x-show="message"
-             x-text="message"
-             x-transition
-             class="absolute mt-1.5 ml-1.5 top-0 p-2 text-white rounded"
-             :class="success ? 'bg-green-700' : 'bg-warning '">
-        </div>
+        {% block message %}
+            <div x-show="message"
+                 x-text="message"
+                 x-transition
+                 class="absolute mt-1.5 ml-1.5 top-0 p-2 text-white rounded"
+                 :class="success ? 'bg-green-700' : 'bg-warning '">
+            </div>
+        {% endblock %}
     </div>
 </div>
