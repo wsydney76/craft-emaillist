@@ -97,7 +97,7 @@ class EmaillistController extends Controller
         ], View::TEMPLATE_MODE_SITE);
     }
 
-    public function actionCreate()
+    public function actionCpRegister()
     {
         $this->requirePermission('utility:emaillist-utility');
 
@@ -121,7 +121,7 @@ class EmaillistController extends Controller
 
     }
 
-    public function actionDelete()
+    public function actionCpUnregister()
     {
         $this->requirePermission('utility:emaillist-utility');
 
@@ -136,9 +136,10 @@ class EmaillistController extends Controller
         return $this->asSuccess('Selected emails deleted.');
     }
 
-    public function actionExport()
+    public function actionCpExport()
     {
         $this->requirePermission('utility:emaillist-utility');
+
         $emails = EmaillistRecord::find()->orderBy('email')->collect();
 
         if (!$emails->count()) {

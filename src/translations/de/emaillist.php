@@ -13,5 +13,12 @@ return [
     'Register' => 'Registrieren',
     'Your email is registered' => 'Ihre E-Mail ist registriert',
     'Unregister' => 'Registrierung löschen',
-    'Confirm privacy' => 'Bestätigen Sie den Datenschutz'
+    'Site' => 'Site',
+    'This is already registered.' => 'Dies ist bereits registriert.',
+    'List' => 'Liste',
+    'Accept privacy policy' => 'Datenschutzbestimmungen akzeptieren',
+    'Please accept privacy policy' => 'Bitte akzeptieren Sie die Datenschutzbestimmungen',
+    'If that was not you, or if you do not want to receive any mailings, you can unregister at any time.' => 'Wenn Sie das nicht waren oder wenn Sie keine Mailings mehr erhalten möchten, können Sie sich jederzeit abmelden.',
+    'Your email address {email} was registered at' => 'Ihre E-Mail-Adresse {email} wurde registriert bei',
+    'Read here' => 'Hier lesen',
 ];

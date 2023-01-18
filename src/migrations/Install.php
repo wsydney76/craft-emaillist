@@ -24,7 +24,6 @@ class Install extends Migration
             'site' => $this->string(255)->notNull(),
             'dateCreated' => $this->dateTime()->notNull(),
             'dateUpdated' => $this->dateTime()->notNull(),
-            'dateDeleted' => $this->dateTime(),
             'uid' => $this->uid()
         ]);
 

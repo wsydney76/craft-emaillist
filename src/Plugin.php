@@ -71,15 +71,6 @@ class Plugin extends BasePlugin
         // (see https://craftcms.com/docs/4.x/extend/events.html to get started)
 
         Event::on(
-            Gc::class,
-            Gc::EVENT_RUN,
-            function() {
-                Craft::$app->gc->hardDelete(EmaillistRecord::tableName());
-            }
-        );
-
-
-        Event::on(
             View::class,
             View::EVENT_REGISTER_SITE_TEMPLATE_ROOTS,
             function(RegisterTemplateRootsEvent $event) {
@@ -97,7 +88,10 @@ class Plugin extends BasePlugin
                 ]);
             }
         );
-        Event::on(Utilities::class, Utilities::EVENT_REGISTER_UTILITY_TYPES, function (RegisterComponentTypesEvent $event) {
+        Event::on(
+            Utilities::class,
+            Utilities::EVENT_REGISTER_UTILITY_TYPES,
+            function (RegisterComponentTypesEvent $event) {
             $event->types[] = EmaillistUtility::class;
         });
     }

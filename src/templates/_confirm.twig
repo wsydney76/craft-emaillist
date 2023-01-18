@@ -2,7 +2,12 @@
 {# @var site \Craft\models\Site #}
 
 <p>
-    PLACEHODER TEXT.
+    {{ 'Your email address {email} was registered at'|t('emaillist', {email: record.email}, site.language) }}
+    <a href="{{ site.baseUrl }}">{{ site.baseUrl }}</a>.
+</p>
+
+<p>
+    {{ 'If that was not you, or if you do not want to receive any mailings, you can unregister at any time.'|t('emaillist', [], site.language) }}
 </p>
 
 <p>

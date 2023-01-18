@@ -34,19 +34,14 @@ class EmaillistService extends Component
     }
 
     public function createEmaillistEntry(string $email, string $list, string $site = ''): EmaillistRecord
-
     {
 
         /** @var EmaillistRecord $record */
-        $record = EmaillistRecord::findWithTrashed()
-            ->where(['email' => $email, 'list' => $list])
+        $record = EmaillistRecord::find()
+            ->where(['email' => $email, 'list' => $list, 'site' => $site])
             ->one();
 
         if ($record) {
-            if ($record->dateDeleted) {
-                $record->restore();
-                $this->notifyEmail($record);
-            }
             return $record;
         }
 
@@ -62,13 +57,15 @@ class EmaillistService extends Component
 
         $record->save();
 
-        $this->notifyEmail($record);
+        if (!$record->hasErrors()) {
+            $this->notifyEmail($record);
+        }
 
         return $record;
     }
 
 
-    public function unregister(string $email ,string $list, string $verificationCode)
+    public function unregister(string $email, string $list, string $verificationCode)
     {
 
         $record = EmaillistRecord::findOne([
@@ -77,7 +74,7 @@ class EmaillistService extends Component
             'verificationCode' => $verificationCode
         ]);
         if ($record) {
-            $record->softDelete();
+            $record->delete();
         }
     }
 
@@ -85,7 +82,7 @@ class EmaillistService extends Component
     {
         $records = EmaillistRecord::find()->where(['in', 'id', $ids])->all();
         foreach ($records as $record) {
-            $record->softDelete();
+            $record->delete();
         }
     }
 
@@ -106,19 +103,20 @@ class EmaillistService extends Component
             ->setHtmlBody(Craft::$app->view->renderTemplate('emaillist/_confirm.twig', [
                 'record' => $record,
                 'site' => $site,
-            ] ))
+            ]))
             ->send();
     }
 
     public function createCsvOutput(Collection $emails): string
     {
-        $out = '"Email","List","Date registered"' . PHP_EOL;
+        $out = '"Email","List","Site","Date registered"' . PHP_EOL;
 
         /** @var EmaillistRecord $email */
         foreach ($emails as $email) {
             $out .=
                 '"' . $email->email . '",' .
                 '"' . $email->list . '",' .
+                '"' . $email->site . '",' .
                 '"' . $email->dateCreated . '"' .
                 PHP_EOL;
         }
@@ -130,9 +128,13 @@ class EmaillistService extends Component
     {
         $settings = Plugin::getInstance()->getSettings();
         if ($settings->sendNotification) {
-            Craft::$app->queue->push(new SendNotification([
-                'id' => $record->id
-            ]));
+            if ($settings->useQueue) {
+                Craft::$app->queue->push(new SendNotification([
+                    'id' => $record->id
+                ]));
+            } else {
+                $this->sendNotification($record);
+            }
         }
     }
 }

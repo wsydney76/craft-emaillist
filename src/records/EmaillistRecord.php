@@ -4,8 +4,6 @@ namespace wsydney76\emaillist\records;
 
 use Craft;
 use craft\db\ActiveRecord;
-use craft\db\SoftDeleteTrait;
-use craft\helpers\DateTimeHelper;
 use craft\helpers\StringHelper;
 use function str_replace;
 use function strtolower;
@@ -17,7 +15,6 @@ use function strtolower;
  */
 class EmaillistRecord extends ActiveRecord
 {
-    use SoftDeleteTrait;
 
     public static function tableName()
     {
@@ -30,7 +27,7 @@ class EmaillistRecord extends ActiveRecord
             [['email', 'list', 'site'], 'required'],
             ['email', 'filter', 'filter' =>  [$this, 'normalizeEmail']],
             ['email', 'email', 'message' => Craft::t('emaillist', 'This is not a valid email address!')],
-            [['email','list'], 'unique', 'targetAttribute' => ['email', 'list']],
+            [['email','list','site'], 'unique', 'targetAttribute' => ['email', 'list','site'], 'message' => Craft::t('emaillist', 'This is already registered.')],
             ['list', 'string', 'max' => 25],
             ['verificationCode', 'string', 'max' => 100]
         ];
@@ -52,13 +49,20 @@ class EmaillistRecord extends ActiveRecord
             $hashedCode = $securityService->hashPassword($unhashedCode);
             $this->verificationCode = $hashedCode;
         }
+
+        if (!$this->list) {
+            $this->list = 'default';
+        }
+
         return parent::beforeSave($insert);
     }
 
     public function attributeLabels()
     {
         return [
-            'email' => Craft::t('emaillist', 'Email')
+            'email' => Craft::t('emaillist', 'Email'),
+            'list' => Craft::t('emaillist', 'List'),
+            'site' => Craft::t('emaillist', 'Site'),
         ];
     }
 }

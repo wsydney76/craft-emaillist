@@ -1,14 +1,14 @@
 {
-    "name": "wsydney76/emaillist",
+    "name": "wsydney76/craft-emaillist",
     "description": "Let users register their email (e.g. for a newsletter)",
     "type": "craft-plugin",
     "license": "mit",
     "support": {
         "email": "wsydney@web.de",
-        "issues": "https://github.com/https//github.com/wsydney76/craft-register-email/issues?state=open",
-        "source": "https://github.com/https//github.com/wsydney76/craft-register-email",
-        "docs": "https://github.com/https//github.com/wsydney76/craft-register-email",
-        "rss": "https://github.com/https//github.com/wsydney76/craft-register-email/releases.atom"
+        "issues": "https://github.com/https//github.com/wsydney76/craft-emaillist/issues?state=open",
+        "source": "https://github.com/https//github.com/wsydney76/ccraft-emaillist",
+        "docs": "https://github.com/https//github.com/wsydney76/ccraft-emaillist",
+        "rss": "https://github.com/https//github.com/wsydney76/ccraft-emaillist/releases.atom"
     },
     "require": {
         "php": ">=8.0.2",

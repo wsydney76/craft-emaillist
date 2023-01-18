@@ -2,7 +2,9 @@
 
 {% set btnColor = btnColor ?? 'primary' %}
 {% set confirmPrivacy = confirmPrivacy is defined ? confirmPrivacy : true %}
+{% set privacyLink = privacyLink ?? '' %}
 {% set list = list ?? 'default' %}
+
 
 <div x-data="{
     email: '',
@@ -18,7 +20,7 @@
     async register() {
 
         if(this.confirmPrivacy && !this.confirmed) {
-            this.setMessage({message: '{{'Please confirm'|t('emaillist')}}', success: false})
+            this.setMessage({message: '{{'Please accept privacy policy'|t('emaillist')}}', success: false})
             return
         }
 
@@ -50,7 +52,7 @@
     getUrl() {
         return `${this.baseUrl}/emaillist/register/?email=${this.email}&list=${this.list}`
     }
-}" style="width: 300px">
+}">
 
     {% block content %}
         <div class="mb-2">
@@ -84,7 +86,13 @@
 
         <div x-show="confirmPrivacy" class="mt-2">
             <input id="emaillist-confirmation" type="checkbox" x-model="confirmed">
-            <label for="emaillist-confirmation">{{ 'Confirm privacy'|t('emaillist') }}</label>
+            <label for="emaillist-confirmation">
+                {{ 'Accept privacy policy'|t('emaillist') }}
+                {% if privacyLink %}
+                    <br>
+                    <a href="{{ privacyLink }}" class="underline" target="_blank">{{ 'Read here'|t('emaillist') }}</a>
+                {% endif %}
+            </label>
         </div>
 
         <div x-show="message"

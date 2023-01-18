@@ -2,7 +2,7 @@
 
 <div style="display: flex; flex-wrap: wrap; justify-content: space-between">
     <form method="post" style="display: flex; ">
-        {{ actionInput('emaillist/emaillist/create') }}
+        {{ actionInput('emaillist/emaillist/cp-register') }}
         {{ csrfInput() }}
 
         {{ forms.textField({
@@ -45,7 +45,7 @@
     </form>
 
     <form method="post" style="margin-left: 24px; margin-top: 24px;">
-        {{ actionInput('emaillist/emaillist/export') }}
+        {{ actionInput('emaillist/emaillist/cp-export') }}
         {{ csrfInput() }}
         {{ forms.submitButton({
             label: 'Export as CSV'
@@ -56,7 +56,7 @@
 {# @var email \wsydney76\emaillist\records\EmaillistRecord #}
 
 <form method="post" onsubmit="return confirm('Delete selected?')">
-    {{ actionInput('emaillist/emaillist/delete') }}
+    {{ actionInput('emaillist/emaillist/cp-unregister') }}
     {{ csrfInput() }}
 
 

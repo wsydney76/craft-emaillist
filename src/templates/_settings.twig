@@ -7,3 +7,10 @@
     instructions: 'Whether to send a confirmation mail to an email when it is first registered.',
     first: true
 }) }}
+
+{{ forms.lightswitchField({
+    label: 'Use queue',
+    name: 'useQueue',
+    on: settings.useQueue,
+    instructions: 'Whether to send mails via a background job.',
+}) }}

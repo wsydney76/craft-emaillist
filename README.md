@@ -2,19 +2,30 @@
 
 Let users register their email (e.g. for a newsletter)
 
-## Requirements
+Work in progress.
 
-This plugin requires Craft CMS 4.3.5 or later, and PHP 8.0.2 or later.
+Another proof-of-concept for decoupling and modernizing existing functionality.
+
+Tbd.
 
 ## Installation
 
-You can install this plugin from the Plugin Store or with Composer.
+Update `composer.json`
 
-#### From the Plugin Store
+```json
+{
+  "minimum-stability": "dev",
+  "prefer-stable": true,
+  "repositories": [
+    {
+      "type": "vcs",
+      "url": "https://github.com/wsydney76/craft-emaillist"
+    }
+  ]
+}
+```
 
-Go to the Plugin Store in your project’s Control Panel and search for “Register Email”. Then press “Install”.
-
-#### With Composer
+### With Composer
 
 Open your terminal and run the following commands:
 
@@ -23,8 +34,8 @@ Open your terminal and run the following commands:
 cd /path/to/my-project.test
 
 # tell Composer to load the plugin
-composer require wsydney76/craft-register-email
+composer require wsydney76/craft-emaillist
 
 # tell Craft to install the plugin
-./craft plugin/install register-email
+./craft plugin/install emaillist
 ```
