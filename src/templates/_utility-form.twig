@@ -1,0 +1,69 @@
+{% import '_includes/forms' as forms %}
+<div id="emaillist-form" style="display: none">
+
+    <form method="post" style="display: flex; ">
+        {{ actionInput('emaillist/emaillist/cp-register') }}
+        {{ csrfInput() }}
+
+        {{ forms.textField({
+            label: 'Email',
+            type: 'email',
+            name: 'email',
+            required: true,
+            value: emaillistRecord.email,
+            errors: emaillistRecord.errors('email'),
+            first: true,
+        }) }}
+
+        {{ forms.textField({
+            label: 'List',
+            type: 'text',
+            name: 'list',
+            required: true,
+            value: emaillistRecord.list,
+            errors: emaillistRecord.errors('list'),
+            first: true,
+            fieldAttributes: {style: 'margin-left: 6px;'},
+        }) }}
+
+
+        {{ forms.selectField({
+            label: 'Site',
+            name: 'site',
+            value: emaillistRecord.site,
+            options: craft.app.sites.allSites|map(site => {label: site.name, value: site.handle}),
+            first: true,
+            fieldAttributes: {style: 'margin-left: 6px;'},
+        }) }}
+
+        <div style="margin-left: 8px; margin-top: 24px;">
+            {{ forms.submitButton({
+                label: 'Register email'
+            }) }}
+        </div>
+
+    </form>
+
+</div>
+
+{% css %}
+#emaillist-form {
+    justify-content: center;
+    align-items: center;
+
+    position: absolute;
+    top: 120px;
+    left: 48px;
+    right: 48px;
+    z-index: 200;
+
+}
+
+#emaillist-form form {
+    border: 1px solid black;
+    background-color: white;
+    padding: 20px;
+    box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
+}
+
+{% endcss %}

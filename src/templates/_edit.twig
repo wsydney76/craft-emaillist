@@ -1,0 +1,116 @@
+{# @param AdModel ad #}
+
+{% extends "_layouts/cp.twig" %}
+{% import '_includes/forms.twig' as forms %}
+
+{% set title = emaillist.isNewRecord ? 'Register a new email'|t('emaillist') : emaillist.email %}
+{% set fullPageForm = true %}
+{% set redirect = cpUrl('utilities/emaillist-utility') %}
+
+{% set formActions = [
+    {
+        label: 'Save and continue editing'|t('emaillist'),
+        redirect: 'emaillist/{id}'|hash,
+        shortcut: true,
+        retainScroll: true
+    },
+    {
+        label: 'Save and add another email'|t('emaillist'),
+        redirect: 'emaillist/new'|hash,
+        shortcut: true,
+        shift: true
+    }
+] %}
+
+{% if not emaillist.isNewRecord %}
+
+    {% set formActions = formActions|push({
+        destructive: true,
+        label: 'Unregister Email'|t('emaillist'),
+        action: 'emaillist/emaillist/cp-unregister',
+        redirect: redirect|hash,
+        confirm: 'Are you sure you want to delete this email?'|t('emaillist'),
+    }) %}
+{% endif %}
+
+{% set crumbs = [
+    { label: "Emails"|t('emaillist'), url: redirect },
+] %}
+
+{% block content %}
+    {{ csrfInput() }}
+    {{ actionInput('emaillist/emaillist/cp-register') }}
+    {{ redirectInput(redirect) }}
+    {{ hiddenInput('id', emaillist.id) }}
+
+    <div id="fields">
+        <div class="flex-fields">
+            {{ forms.textField({
+                label: 'Email',
+                type: 'email',
+                name: 'email',
+                required: true,
+                value: emaillist.email,
+                errors: emaillist.errors('email'),
+            }) }}
+
+            {% set lists = collect(settings.lists) %}
+           
+            {% if lists.doesntContain('value', emaillist.list) %}
+                {% do lists.push({label: "#{emaillist.list|ucfirst} (not configured)", value: emaillist.list}) %}
+            {% endif %}
+
+
+            {{ forms.selectField({
+                label: 'List',
+                type: 'text',
+                name: 'list',
+                required: true,
+                value: emaillist.list,
+                errors: emaillist.errors('list'),
+                options: lists
+            }) }}
+
+
+            {{ forms.selectField({
+                label: 'Site',
+                name: 'site',
+                value: emaillist.site,
+                options: craft.app.sites.allSites|map(site => {label: site.name, value: site.handle}),
+            }) }}
+
+        </div>
+    </div>
+
+{% endblock %}
+
+
+{% block details %}
+
+    <div id="meta-details" class="meta read-only">
+
+        <div class="data">
+            <h5 class="heading">ID</h5>
+            <div class="value">
+                {{ emaillist.isNewRecord ? 'New'|t('emaillist') : emaillist.id }}
+            </div>
+        </div>
+
+        {% if not emaillist.isNewRecord %}
+            <div class="data">
+                <h5 class="heading">{{ 'Created at'|t('emaillist') }}</h5>
+                <div class="value">
+                    {{ craft.app.formatter.asDatetime(emaillist.dateCreated) }}
+                </div>
+            </div>
+            <div class="data">
+                <h5 class="heading">{{ 'Updated at'|t('emaillist') }}</h5>
+                <div class="value">
+                    {{ craft.app.formatter.asDatetime(emaillist.dateUpdated) }}
+                </div>
+            </div>
+        {% endif %}
+
+    </div>
+
+{% endblock %}

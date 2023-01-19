@@ -1,58 +1,10 @@
-{% import '_includes/forms' as forms %}
-
-<div style="display: flex; flex-wrap: wrap; justify-content: space-between">
-    <form method="post" style="display: flex; ">
-        {{ actionInput('emaillist/emaillist/cp-register') }}
-        {{ csrfInput() }}
-
-        {{ forms.textField({
-            label: 'Email',
-            type: 'email',
-            name: 'email',
-            required: true,
-            value: emaillistRecord.email,
-            errors: emaillistRecord.errors('email'),
-            first: true,
-        }) }}
-
-        {{ forms.textField({
-            label: 'List',
-            type: 'text',
-            name: 'list',
-            required: true,
-            value: emaillistRecord.list,
-            errors: emaillistRecord.errors('list'),
-            first: true,
-            fieldAttributes: {style: 'margin-left: 6px;'},
-        }) }}
 
 
-        {{ forms.selectField({
-            label: 'Site',
-            name: 'site',
-            value: emaillistRecord.site,
-            options: craft.app.sites.allSites|map(site => {label: site.name, value: site.handle}),
-            first: true,
-            fieldAttributes: {style: 'margin-left: 6px;'},
-        }) }}
 
-        <div style="margin-left: 8px; margin-top: 24px;">
-            {{ forms.submitButton({
-                label: 'Register email'
-            }) }}
-        </div>
+<h1>{{ 'Registered Emails'|t('emaillist') }}</h1>
 
-    </form>
+{% include 'emaillist/_utility-table.twig' %}
 
-    <form method="post" style="margin-left: 24px; margin-top: 24px;">
-        {{ actionInput('emaillist/emaillist/cp-export') }}
-        {{ csrfInput() }}
-        {{ forms.submitButton({
-            label: 'Export as CSV'
-        }) }}
-    </form>
-</div>
 
 {# @var email \wsydney76\emaillist\records\EmaillistRecord #}
 
-{% include 'emaillist/_widget-table.twig' %}

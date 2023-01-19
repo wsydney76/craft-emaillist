@@ -1,0 +1,133 @@
+{# @param Admodel ad Used only to get translated attribute labels #}
+
+{% import '_includes/forms.twig' as forms %}
+
+
+{% do view.registerAssetBundle('craft\\web\\assets\\admintable\\AdminTableAsset') %}
+{% do view.registerTranslations('emaillist', [
+    'Date',
+    'Email',
+    'Search Emails',
+    'Search',
+]) %}
+
+
+<div style="display: flex; justify-content: space-between">
+    <div style="display: flex; justify-content: start">
+        {# block toolbar #}
+        {{ forms.selectField({
+            label: 'By List'|t('emaillist'),
+            id: 'listSelect',
+            options:
+            emaillistQuery.select('list').distinct().orderBy('list').column
+            |map(list => {label: list, value: list})
+            |unshift({label: 'All'|t('emaillist'), value: ''})
+
+        }) }}
+
+        <div style="margin-left: 12px;">
+            {{ forms.selectField({
+                label: 'By Email'|t('emaillist'),
+                id: 'emailSelect',
+                options: emaillistQuery.select('email').distinct().orderBy('email').column
+                |map(email => {label:email, value:email})
+                |unshift({label: 'All'|t('emaillist'), value: ''}),
+                first:true
+            }) }}
+        </div>
+    </div>
+
+    {# block actionButton #}
+    <div style="display: flex">
+        <button id="filterResetBtn" class="btn">{{ 'Reset'|t('emaillist') }}</button>
+        <button id="reloadBtn" style="margin-left:  6px;" class="btn">{{ 'Reload'|t('emaillist') }}</button>
+        <a style="margin-left:  6px;" href="{{ cpUrl('emaillist/new') }}" class="btn submit add icon">{{ 'Register Email'|t('emaillist') }}</a>
+
+    </div>
+</div>
+
+<div id="emaillist-vue-admin-table"></div>
+
+<div style="margin-top: 24px; text-align: right;">
+    <a class="btn" href="{{ actionUrl('emaillist/emaillist/cp-export') }}">{{ 'Export as CSV'|t('emaillist') }}</a>
+</div>
+
+{# Use a separate js block as phpstorm cannot handle a mix of js and twig and displays errors  #}
+{% js %}
+list = 'List';
+email = 'Email';
+site = 'Site';
+{% endjs %}
+
+{% js %}
+
+tableDataEndpoint = 'emaillist/emaillist/table-data';
+
+//emaillistTable = new Craft.VueAdminTable(settings);
+emaillistTable = new Craft.VueAdminTable().init({
+    container: '#emaillist-vue-admin-table',
+    tableDataEndpoint: tableDataEndpoint,
+    perPage: 12,
+    deleteAction: 'emaillist/emaillist/cp-unregister',
+    columns: [
+        {name: '__slot:title', title: email, sortField: 'email'},
+        {name: 'list', title: list, sortField: 'list'},
+        {name: 'site', title: site},
+        {name: 'date', title: Craft.t('emaillist', 'Date'), sortField: 'dateCreated', dataClass: 'column-nowrap'}
+    ],
+    search: true,
+    searchPlaceholder: Craft.t('emaillist', 'Search Emails'),
+    checkboxes: true,
+    actions: [
+        {
+            label: Craft.t('emaillist', 'Actions'),
+            actions: [
+                {
+                    label: Craft.t('emaillist', 'Unregister'),
+                    action: 'emaillist/emaillist/cp-unregister',
+                    ajax: true
+                }
+            ]
+        }
+    ]
+});
+
+filterSelectors = '#listSelect,#emailSelect';
+
+$(filterSelectors).change(() => filterEmaillistTable());
+
+$('#filterResetBtn').click(() => {
+    $(filterSelectors).val('');
+    setVueAdminTableSearchTerm(emaillistTable, '');
+    filterEmaillistTable();
+});
+
+$('#reloadBtn').click(() => reloadEmaillistTable());
+
+function filterEmaillistTable() {
+    var endpoint = tableDataEndpoint
+        + '?list=' + $('#listSelect').val()
+        + '&email=' + $('#emailSelect').val();
+
+    setVueAdminTableDataEndPoint(emaillistTable, endpoint);
+}
+
+function reloadEmaillistTable() {
+    reloadVueAdminTable(emaillistTable);
+}
+
+// TODO: Add to global scripts
+function setVueAdminTableDataEndPoint(table, endpoint) {
+    // https://github.com/craftcms/cms/issues/6695#issuecomment-678684530
+    table.$children[0].$props.tableDataEndpoint = endpoint;
+}
+
+function reloadVueAdminTable(table) {
+    table.$children[0].reload();
+}
+
+function setVueAdminTableSearchTerm(table, term) {
+    table.$children[0].searchTerm = term;
+}
+
+{% endjs %}

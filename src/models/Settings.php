@@ -8,4 +8,5 @@ class Settings extends Model
 {
     public bool $sendNotification = true;
     public bool $useQueue = true;
+    public array $lists = [];
 }

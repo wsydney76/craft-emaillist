@@ -88,6 +88,16 @@ class Plugin extends BasePlugin
                 ]);
             }
         );
+
+        // Register CP Urls
+        Event::on(
+            UrlManager::class,
+            UrlManager::EVENT_REGISTER_CP_URL_RULES, function(RegisterUrlRulesEvent $event): void {
+            $event->rules['emaillist/<id:[\d]+>'] = 'emaillist/emaillist/cp-edit';
+            $event->rules['emaillist/new'] = 'emaillist/emaillist/cp-edit';
+
+        });
+
         Event::on(
             Utilities::class,
             Utilities::EVENT_REGISTER_UTILITY_TYPES,

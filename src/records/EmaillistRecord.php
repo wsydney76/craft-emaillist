@@ -27,7 +27,7 @@ class EmaillistRecord extends ActiveRecord
             [['email', 'list', 'site'], 'required'],
             ['email', 'filter', 'filter' =>  [$this, 'normalizeEmail']],
             ['email', 'email', 'message' => Craft::t('emaillist', 'This is not a valid email address!')],
-            [['email','list','site'], 'unique', 'targetAttribute' => ['email', 'list','site'], 'message' => Craft::t('emaillist', 'This is already registered.')],
+            [['email','list','site'], 'unique', 'targetAttribute' => ['email', 'list','site']],
             ['list', 'string', 'max' => 25],
             ['verificationCode', 'string', 'max' => 100]
         ];

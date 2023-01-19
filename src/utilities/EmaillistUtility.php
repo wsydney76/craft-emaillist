@@ -30,8 +30,8 @@ class EmaillistUtility extends Utility
     static function contentHtml(): string
     {
         return Craft::$app->view->renderTemplate('emaillist/_utility.twig' ,[
-            'emails' => EmaillistRecord::find()->orderBy('dateCreated desc')->collect(),
-            'emaillistRecord' => Craft::$app->urlManager->getRouteParams()['emaillistRecord'] ?? new EmaillistRecord(['list' => 'default'])
+            'emaillistRecord' => Craft::$app->urlManager->getRouteParams()['emaillistRecord'] ?? new EmaillistRecord(['list' => 'default']),
+            'emaillistQuery' => EmaillistRecord::find(),
         ]);
     }
 }

@@ -14,3 +14,26 @@
     on: settings.useQueue,
     instructions: 'Whether to send mails via a background job.',
 }) }}
+
+{{ d(settings.lists) }}
+
+{{ forms.editableTableField({
+    label: "Lists"|t('emaillist'),
+    name: 'lists',
+    id: 'lists',
+    cols: {
+        label: {
+            type: 'singleline',
+            heading: 'Label'|t('emaillist'),
+        },
+        value: {
+            type: 'singleline',
+            heading: 'Handle'|t('emaillist'),
+        }
+    },
+    rows: settings.lists,
+    allowAdd: true,
+    allowDelete: true,
+    allowReorder: true,
+    addRowLabel: "Add a list"|t('emaillist'),
+}) }}
