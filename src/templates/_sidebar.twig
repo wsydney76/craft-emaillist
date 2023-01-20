@@ -1,0 +1,25 @@
+<div id="meta-details" class="meta read-only">
+
+    <div class="data">
+        <h3 class="heading">ID:</h3>
+        <div class="value">
+            {{ emaillist.isNewRecord ? 'New'|t('emaillist') : emaillist.id }}
+        </div>
+    </div>
+
+    {% if not emaillist.isNewRecord %}
+        <div class="data">
+            <h3 class="heading">{{ 'Created at'|t('emaillist') }}:</h3>
+            <div class="value">
+                {{ craft.app.formatter.asDatetime(emaillist.dateCreated) }}
+            </div>
+        </div>
+        <div class="data">
+            <h3 class="heading">{{ 'Updated at'|t('emaillist') }}:</h3>
+            <div class="value">
+                {{ craft.app.formatter.asDatetime(emaillist.dateUpdated) }}
+            </div>
+        </div>
+    {% endif %}
+
+</div>

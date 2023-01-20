@@ -12,7 +12,10 @@ use wsydney76\emaillist\events\EmaillistRegisterEvent;
 use wsydney76\emaillist\Plugin;
 use wsydney76\emaillist\records\EmaillistRecord;
 use wsydney76\emaillist\services\EmaillistService;
+use yii\debug\components\search\matchers\GreaterThanOrEqual;
+use yii\web\NotFoundHttpException;
 use yii\web\Response;
+use function key_exists;
 use function str_replace;
 use function ucfirst;
 
@@ -101,15 +104,67 @@ class EmaillistController extends Controller
     }
 
 
-    public function actionCpEdit($id = null) {
+    public function actionCpEdit($id = null)
+    {
         $this->requirePermission('utility:emaillist-utility');
 
-        return $this->view->renderPageTemplate('emaillist/_edit', [
-            'settings' => Plugin::getInstance()->getSettings(),
-            'emaillistQuery' => EmaillistRecord::find(),
-            'emaillist' => Craft::$app->urlManager->getRouteParams()['emaillist'] ??
-                ($id ? EmaillistRecord::findOne($id) : new EmaillistRecord())
-        ]);
+        $record = null;
+
+        if (array_key_exists('emaillist', Craft::$app->urlManager->getRouteParams())) {
+            $record = Craft::$app->urlManager->getRouteParams()['emaillist'];
+        }
+
+        if (!$record) {
+            $record = $id ? EmaillistRecord::findOne($id) : new EmaillistRecord();
+        }
+
+        if (!$record) {
+            throw new NotFoundHttpException();
+        }
+
+        $buttons = [
+            [
+                'label' => Craft::t('app', 'Save and continue editing'),
+                'redirect' => 'emaillist/{id}',
+                'shortcut' => true,
+                'retainScroll' => true,
+            ],
+            [
+                'label' => Craft::t('app', 'Save and add another email'),
+                'redirect' => 'emaillist/new',
+                'shortcut' => true,
+                'shift' => true,
+            ]
+        ];
+
+        if (!$record->isNewRecord) {
+            $buttons[] = [
+                'label' => Craft::t('app', 'Unregister Email'),
+                'redirect' => 'emaillist',
+                'destructive' => true,
+                'action' => 'emaillist/emaillist/cp-unregister',
+                'confirm' => Craft::t('emaillist', 'Are you sure you want to delete this email?'),
+            ];
+        }
+
+        $title = $record->isNewRecord ?
+            Craft::t('emaillist', 'Create new Email Registration') :
+            Craft::t('emaillist', 'Edit Email Registration');
+
+        return $this->asCpScreen()
+            ->title($title)
+            ->addCrumb(Craft::t('emaillist', Craft::t('emaillist', 'Email Lists')), 'emaillist')
+            ->action('emaillist/emaillist/cp-register')
+            ->redirectUrl('emaillist')
+            ->saveShortcutRedirectUrl('emaillist/{id}')
+            ->altActions($buttons)
+            ->contentTemplate('emaillist/_edit.twig', [
+                'settings' => Plugin::getInstance()->getSettings(),
+                'emaillist' => $record
+            ])
+            ->sidebarTemplate('emaillist/_sidebar.twig', [
+                'emaillist' => $record
+            ]);
     }
 
     public function actionCpRegister()
@@ -121,7 +176,11 @@ class EmaillistController extends Controller
         $list = Craft::$app->request->getRequiredBodyParam('list');
         $site = Craft::$app->request->getRequiredBodyParam('site');
 
-        $record =  $id ? EmaillistRecord::findOne($id) : new EmaillistRecord();
+        $record = $id ? EmaillistRecord::findOne($id) : new EmaillistRecord();
+
+        if (!$record) {
+            throw new NotFoundHttpException();
+        }
 
         $record->setAttributes([
             'email' => $email,

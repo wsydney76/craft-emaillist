@@ -3,7 +3,10 @@
 namespace wsydney76\emaillist;
 
 use Craft;
+use craft\events\DefineBehaviorsEvent;
 use craft\services\Gc;
+use craft\web\twig\variables\CraftVariable;
+use wsydney76\emaillist\behaviors\CraftVariableBehavior;
 use wsydney76\emaillist\records\EmaillistRecord;
 use function array_merge;
 use craft\base\Model;
@@ -34,6 +37,7 @@ class Plugin extends BasePlugin
 {
     public string $schemaVersion = '1.0.0';
     public bool $hasCpSettings = true;
+    public bool $hasCpSection = true;
 
     public static function config(): array
     {
@@ -104,5 +108,13 @@ class Plugin extends BasePlugin
             function (RegisterComponentTypesEvent $event) {
             $event->types[] = EmaillistUtility::class;
         });
+
+        Event::on(
+            CraftVariable::class,
+            CraftVariable::EVENT_DEFINE_BEHAVIORS,
+            function(DefineBehaviorsEvent $event) {
+                $event->behaviors[] = CraftVariableBehavior::class;
+            }
+        );
     }
 }

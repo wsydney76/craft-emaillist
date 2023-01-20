@@ -19,7 +19,7 @@
             label: 'By List'|t('emaillist'),
             id: 'listSelect',
             options:
-            emaillistQuery.select('list').distinct().orderBy('list').column
+            craft.emaillist.select('list').distinct().orderBy('list').column
             |map(list => {label: list, value: list})
             |unshift({label: 'All'|t('emaillist'), value: ''})
 
@@ -29,7 +29,7 @@
             {{ forms.selectField({
                 label: 'By Email'|t('emaillist'),
                 id: 'emailSelect',
-                options: emaillistQuery.select('email').distinct().orderBy('email').column
+                options: craft.emaillist.select('email').distinct().orderBy('email').column
                 |map(email => {label:email, value:email})
                 |unshift({label: 'All'|t('emaillist'), value: ''}),
                 first:true
@@ -41,6 +41,7 @@
     <div style="display: flex">
         <button id="filterResetBtn" class="btn">{{ 'Reset'|t('emaillist') }}</button>
         <button id="reloadBtn" style="margin-left:  6px;" class="btn">{{ 'Reload'|t('emaillist') }}</button>
+        <button id="addBtn" style="margin-left:  6px;" class="btn add icon">{{ 'Add'|t('emaillist') }}</button>
         <a style="margin-left:  6px;" href="{{ cpUrl('emaillist/new') }}" class="btn submit add icon">{{ 'Register Email'|t('emaillist') }}</a>
 
     </div>
@@ -101,6 +102,10 @@ $('#filterResetBtn').click(() => {
     setVueAdminTableSearchTerm(emaillistTable, '');
     filterEmaillistTable();
 });
+
+$('#addBtn').click(() => {
+    alert(1)
+})
 
 $('#reloadBtn').click(() => reloadEmaillistTable());
 
