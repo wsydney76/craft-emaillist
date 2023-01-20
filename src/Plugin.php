@@ -103,13 +103,6 @@ class Plugin extends BasePlugin
         });
 
         Event::on(
-            Utilities::class,
-            Utilities::EVENT_REGISTER_UTILITY_TYPES,
-            function (RegisterComponentTypesEvent $event) {
-            $event->types[] = EmaillistUtility::class;
-        });
-
-        Event::on(
             CraftVariable::class,
             CraftVariable::EVENT_DEFINE_BEHAVIORS,
             function(DefineBehaviorsEvent $event) {

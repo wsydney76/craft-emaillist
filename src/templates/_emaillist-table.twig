@@ -2,13 +2,18 @@
 
 {% import '_includes/forms.twig' as forms %}
 
-
 {% do view.registerAssetBundle('craft\\web\\assets\\admintable\\AdminTableAsset') %}
 {% do view.registerTranslations('emaillist', [
-    'Date',
+    'Date created',
     'Email',
+    'List',
     'Search Emails',
     'Search',
+    'Actions',
+    'Delete email registrations',
+    'Reload',
+    'Reset',
+    'Add'
 ]) %}
 
 
@@ -37,14 +42,7 @@
         </div>
     </div>
 
-    {# block actionButton #}
-    <div style="display: flex">
-        <button id="filterResetBtn" class="btn">{{ 'Reset'|t('emaillist') }}</button>
-        <button id="reloadBtn" style="margin-left:  6px;" class="btn">{{ 'Reload'|t('emaillist') }}</button>
-        <button id="addBtn" style="margin-left:  6px;" class="btn add icon">{{ 'Add'|t('emaillist') }}</button>
-        <a style="margin-left:  6px;" href="{{ cpUrl('emaillist/new') }}" class="btn submit add icon">{{ 'Register Email'|t('emaillist') }}</a>
 
-    </div>
 </div>
 
 <div id="emaillist-vue-admin-table"></div>
@@ -53,11 +51,23 @@
     <a class="btn" href="{{ actionUrl('emaillist/emaillist/cp-export') }}">{{ 'Export as CSV'|t('emaillist') }}</a>
 </div>
 
-{# Use a separate js block as phpstorm cannot handle a mix of js and twig and displays errors  #}
 {% js %}
-list = 'List';
-email = 'Email';
-site = 'Site';
+buttons = [
+    {
+        label: Craft.t('emaillist', 'Reset'),
+        href: 'javascript:resetEmaillistTable()'
+    },
+    {
+        label: Craft.t('emaillist', 'Reload'),
+        href: 'javascript:reloadEmaillistTable()'
+    },
+    {
+        label: Craft.t('emaillist', 'Add'),
+        icon: 'plus',
+        href: '{{ cpUrl('emaillist/new') }}',
+
+    },
+]
 {% endjs %}
 
 {% js %}
@@ -71,10 +81,10 @@ emaillistTable = new Craft.VueAdminTable().init({
     perPage: 12,
     deleteAction: 'emaillist/emaillist/cp-unregister',
     columns: [
-        {name: '__slot:title', title: email, sortField: 'email'},
-        {name: 'list', title: list, sortField: 'list'},
-        {name: 'site', title: site},
-        {name: 'date', title: Craft.t('emaillist', 'Date'), sortField: 'dateCreated', dataClass: 'column-nowrap'}
+        {name: '__slot:title', title: Craft.t('emaillist', 'Email'), sortField: 'email'},
+        {name: 'list', title: Craft.t('emaillist', 'List'), sortField: 'list'},
+        {name: 'site', title: Craft.t('emaillist', 'Site')},
+        {name: 'date', title: Craft.t('emaillist', 'Date created'), sortField: 'dateCreated', dataClass: 'column-nowrap'}
     ],
     search: true,
     searchPlaceholder: Craft.t('emaillist', 'Search Emails'),
@@ -84,13 +94,14 @@ emaillistTable = new Craft.VueAdminTable().init({
             label: Craft.t('emaillist', 'Actions'),
             actions: [
                 {
-                    label: Craft.t('emaillist', 'Unregister'),
+                    label: Craft.t('emaillist', 'Delete email registrations'),
                     action: 'emaillist/emaillist/cp-unregister',
                     ajax: true
                 }
             ]
         }
-    ]
+    ],
+    buttons: buttons,
 });
 
 filterSelectors = '#listSelect,#emailSelect';
@@ -98,13 +109,17 @@ filterSelectors = '#listSelect,#emailSelect';
 $(filterSelectors).change(() => filterEmaillistTable());
 
 $('#filterResetBtn').click(() => {
-    $(filterSelectors).val('');
-    setVueAdminTableSearchTerm(emaillistTable, '');
-    filterEmaillistTable();
+    resetEmaillistTable()
 });
 
 $('#addBtn').click(() => {
-    alert(1)
+    const slideout = new Craft.CpScreenSlideout('emaillist/emaillist/cp-edit');
+    slideout.on('submit', ev => {
+        reloadEmaillistTable()
+    });
+    slideout.on('close', () => {
+        // alert('close')
+    });
 })
 
 $('#reloadBtn').click(() => reloadEmaillistTable());
@@ -115,6 +130,12 @@ function filterEmaillistTable() {
         + '&email=' + $('#emailSelect').val();
 
     setVueAdminTableDataEndPoint(emaillistTable, endpoint);
+}
+
+function resetEmaillistTable() {
+    $(filterSelectors).val('');
+    setVueAdminTableSearchTerm(emaillistTable, '');
+    filterEmaillistTable();
 }
 
 function reloadEmaillistTable() {

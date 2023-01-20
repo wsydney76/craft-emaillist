@@ -22,6 +22,7 @@ class Install extends Migration
             'verificationCode' => $this->string(255)->notNull(),
             'list' => $this->string(25)->defaultValue('default'),
             'site' => $this->string(255)->notNull(),
+            'active' => $this->boolean()->defaultValue(true),
             'dateCreated' => $this->dateTime()->notNull(),
             'dateUpdated' => $this->dateTime()->notNull(),
             'uid' => $this->uid()

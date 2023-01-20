@@ -7,7 +7,7 @@
 <div id="fields">
     <div class="flex-fields">
         {{ forms.textField({
-            label: 'Email',
+            label: 'Email'|t('emaillist'),
             type: 'email',
             name: 'email',
             required: true,
@@ -23,7 +23,7 @@
 
 
         {{ forms.selectField({
-            label: 'List',
+            label: 'List'|t('emaillist'),
             type: 'text',
             name: 'list',
             required: true,
@@ -34,11 +34,17 @@
 
 
         {{ forms.selectField({
-            label: 'Site',
+            label: 'Site'|t('emaillist'),
             name: 'site',
             value: emaillist.site,
             required: true,
             options: craft.app.sites.allSites|map(site => {label: site.name, value: site.handle}),
+        }) }}
+        
+        {{ forms.lightswitchField({
+            label: 'Active'|t('emaillist'),
+            name: 'active',
+            on: emaillist.isNewRecord ? true :  emaillist.active
         }) }}
 
     </div>

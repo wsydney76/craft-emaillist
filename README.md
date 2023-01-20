@@ -114,10 +114,11 @@ Event::on(
 
 * Send notification mail?
 * Use queue job for sending mails?
+* Lists (Label/Handle)
 
-## Utility
+## CP Section
 
-* Add/delete registrations
+* Add/edit/delete registrations
 * Export registrations as csv
 
 ## Retrieve Registrations
@@ -133,6 +134,5 @@ $emails = EmaillistRecord::find()
 
 ## Todos
 
-* Improve utility to handle larger lists (pagination, filter, sorting).
 * Better customization for texts (confirmations emails).
-* Make lists configurable
+

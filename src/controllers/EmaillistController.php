@@ -106,10 +106,11 @@ class EmaillistController extends Controller
 
     public function actionCpEdit($id = null)
     {
-        $this->requirePermission('utility:emaillist-utility');
+        $this->requirePermission('accessplugin-emaillist');
 
         $record = null;
 
+        // Failed save
         if (array_key_exists('emaillist', Craft::$app->urlManager->getRouteParams())) {
             $record = Craft::$app->urlManager->getRouteParams()['emaillist'];
         }
@@ -130,7 +131,7 @@ class EmaillistController extends Controller
                 'retainScroll' => true,
             ],
             [
-                'label' => Craft::t('app', 'Save and add another email'),
+                'label' => Craft::t('emaillist', 'Save and register another email'),
                 'redirect' => 'emaillist/new',
                 'shortcut' => true,
                 'shift' => true,
@@ -139,7 +140,7 @@ class EmaillistController extends Controller
 
         if (!$record->isNewRecord) {
             $buttons[] = [
-                'label' => Craft::t('app', 'Unregister Email'),
+                'label' => Craft::t('emaillist', 'Delete email registration'),
                 'redirect' => 'emaillist',
                 'destructive' => true,
                 'action' => 'emaillist/emaillist/cp-unregister',
@@ -153,28 +154,32 @@ class EmaillistController extends Controller
 
         return $this->asCpScreen()
             ->title($title)
-            ->addCrumb(Craft::t('emaillist', Craft::t('emaillist', 'Email Lists')), 'emaillist')
+            ->addCrumb(
+                Craft::t('emaillist', Craft::t('emaillist', 'Email Lists')),
+                'emaillist')
             ->action('emaillist/emaillist/cp-register')
             ->redirectUrl('emaillist')
             ->saveShortcutRedirectUrl('emaillist/{id}')
             ->altActions($buttons)
-            ->contentTemplate('emaillist/_edit.twig', [
+            ->contentTemplate('emaillist/_emaillist-edit.twig', [
                 'settings' => Plugin::getInstance()->getSettings(),
                 'emaillist' => $record
             ])
-            ->sidebarTemplate('emaillist/_sidebar.twig', [
+            ->sidebarTemplate('emaillist/_emaillist-sidebar.twig', [
                 'emaillist' => $record
             ]);
     }
 
     public function actionCpRegister()
     {
-        $this->requirePermission('utility:emaillist-utility');
+        $this->requirePermission('accessplugin-emaillist');
+
 
         $id = Craft::$app->request->getRequiredBodyParam('id');
         $email = Craft::$app->request->getRequiredBodyParam('email');
         $list = Craft::$app->request->getRequiredBodyParam('list');
         $site = Craft::$app->request->getRequiredBodyParam('site');
+        $active = Craft::$app->request->getRequiredBodyParam('active');
 
         $record = $id ? EmaillistRecord::findOne($id) : new EmaillistRecord();
 
@@ -185,21 +190,29 @@ class EmaillistController extends Controller
         $record->setAttributes([
             'email' => $email,
             'list' => $list ?? 'default',
-            'site' => $site
+            'site' => $site,
         ]);
+
+        $record->active = $active ? 1 : 0;
 
         $record->save();
 
         if ($record->hasErrors()) {
-            return $this->asModelFailure($record, 'Could not register email', 'emaillist');
+            return $this->asModelFailure(
+                $record,
+                Craft::t('emaillist', 'Could not save email registration.'),
+                'emaillist');
         }
 
-        return $this->asModelSuccess($record, 'Email registered.', 'emaillist');
+        return $this->asModelSuccess(
+            $record,
+            Craft::t('emaillist', 'Email registration saved.'),
+            'emaillist');
     }
 
     public function actionCpUnregister()
     {
-        $this->requirePermission('utility:emaillist-utility');
+        $this->requirePermission('accessplugin-emaillist');
 
         $ids = Craft::$app->request->getBodyParam('ids', []);
 
@@ -220,7 +233,7 @@ class EmaillistController extends Controller
 
     public function actionCpExport()
     {
-        $this->requirePermission('utility:emaillist-utility');
+        $this->requirePermission('accessplugin-emaillist');
 
         $emails = EmaillistRecord::find()
             ->orderBy('email')
@@ -239,10 +252,9 @@ class EmaillistController extends Controller
     {
         $settings = Plugin::getInstance()->settings;
         $this->requireAcceptsJson();
-        $this->requirePermission('utility:emaillist-utility');
+        $this->requirePermission('accessplugin-emaillist');
 
         $request = Craft::$app->request;
-        $view = Craft::$app->view;
         $formatter = Craft::$app->formatter;
 
         $page = $request->getParam('page') ?: 1;
@@ -275,7 +287,7 @@ class EmaillistController extends Controller
             'id' => $email->id,
             'title' => $email->email,
             'url' => UrlHelper::cpUrl("emaillist/{$email->id}"),
-            'status' => true,
+            'status' => $email->active,
             'list' => $lists->firstWhere('value', $email->list)['label'] ?? ucfirst($email->list),
             'site' => Craft::$app->sites->getSiteByHandle($email->site)->name,
             'date' => $formatter->asRelativeTime($email->dateCreated),
