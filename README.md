@@ -110,12 +110,10 @@ Set up your own template that extends the plugins component and pull in/overwrit
 {% block component %}
     <div class="flex space-x-8">
         <div>
-            {# Overwrite intro text #}
-            {% block content %}
-                <div class="mt-2 text-2xl uppercase">
-                    Subscribe to the newsletter
-                </div>
-            {% endblock %}
+            {# Your own intro text #}
+            <div class="mt-2 text-2xl uppercase">
+                Subscribe to the newsletter
+            </div>
         </div>
 
         <div class="w-[500px]">
@@ -127,15 +125,13 @@ Set up your own template that extends the plugins component and pull in/overwrit
             <div class="mt-1 text-sm">
 
                 {# Your own message #}
-                {% block message %}
-                    <div x-show="message"
-                         x-text="message"
-                         x-transition
-                         class="my-1.5 p-2 text-white rounded"
-                         :class="success ? 'bg-green-700' : 'bg-warning '">
-                    </div>
-                {% endblock %}
-
+                <div x-show="message"
+                     x-text="message"
+                     x-transition
+                     class="my-1.5 p-2 text-white rounded"
+                     :class="success ? 'bg-green-700' : 'bg-warning '">
+                </div>
+                
                 {# Your own privacy text #}
                 By providing my e-mail address, I understand that you will send me information by e-mail (newsletter)
                 about your festival and its events.
@@ -152,6 +148,7 @@ Set up your own template that extends the plugins component and pull in/overwrit
 
         </div>
         <div>
+            {# use block('button') to pull in the default button #}
             <button type="button" class="text-2xl uppercase underline" @click="register()">SIGN UP</button>
         </div>
     </div>
