@@ -80,8 +80,9 @@ Supports multiple lists.
 
 Blocks:
 
+* component: The whole markup. See example below.
 * content: Place any content above the input field here
-* inputs: Your own input/submit button here. Must react to the same Alpine.js dat and trigger the same events as the default block. 
+* inputs/email/button: Your own input/submit button here. Must react to the same Alpine.js dat and trigger the same events as the default block.
 * privacy: Your own privacy display here. Must react to the same Alpine.js data as the default block.
 * message: Your own message display here. Must react to the same Alpine.js data as the default block.
 
@@ -93,6 +94,71 @@ Params:
 * list: list handle. 'default' by default.
 
 Wrap the component in a div if you want to control the width.
+
+##  Advanced customization
+
+Set up your own template that extends the plugins component and pull in/overwrite blocks as needed.
+
+```twig
+{% extends "emaillist/_register-form.twig" %}
+
+{# Set parameters #}
+{% set list = 'test1' %}
+{% set confirmPrivacy = false %}
+
+{# Overwrite all markup inside the Alpine.js component #}
+{% block component %}
+    <div class="flex space-x-8">
+        <div>
+            {# Overwrite intro text #}
+            {% block content %}
+                <div class="mt-2 text-2xl uppercase">
+                    Subscribe to the newsletter
+                </div>
+            {% endblock %}
+        </div>
+
+        <div class="w-[500px]">
+            <div>
+                {# Pull in the email field #}
+                {{ block('email') }}
+            </div>
+
+            <div class="mt-1 text-sm">
+
+                {# Your own message #}
+                {% block message %}
+                    <div x-show="message"
+                         x-text="message"
+                         x-transition
+                         class="my-1.5 p-2 text-white rounded"
+                         :class="success ? 'bg-green-700' : 'bg-warning '">
+                    </div>
+                {% endblock %}
+
+                {# Your own privacy text #}
+                By providing my e-mail address, I understand that you will send me information by e-mail (newsletter)
+                about your festival and its events.
+                My data will not be passed on to third parties.
+                I am aware that I can unsubscribe at any time via the unsubscribe link in the newsletter.
+
+                {% set privacyEntry = craft.entries.section('legal').type('privacy').one %}
+                {% if privacyEntry %}
+                    <div>
+                        Please also note our <a class="underline" href="{{ privacyEntry.url }}">privacy policy.</a>
+                    </div>
+                {% endif %}
+            </div>
+
+        </div>
+        <div>
+            <button type="button" class="text-2xl uppercase underline" @click="register()">SIGN UP</button>
+        </div>
+    </div>
+{% endblock %}
+```
+
+## Security
 
 Does not support any kind of spam protection right now.
 

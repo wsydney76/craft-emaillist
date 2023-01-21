@@ -84,58 +84,65 @@
 
 }">
 
-    {% block content %}
-        <div class="mb-2">
-            {{ 'Register Email'|t('emaillist') }}
+    {% block component %}
+        {% block content %}
+            <div class="mb-2">
+                {{ 'Register Email'|t('emaillist') }}
+            </div>
+        {% endblock %}
+
+        <div class="relative">
+
+            {% block inputs %}
+                <div class="flex">
+                    {% block email %}
+                        {{ forms.input({
+                            name: 'email',
+                            value: '',
+                            extraAttr: {
+                                'x-model': 'email',
+                                '@keyup.enter': 'register()',
+                                'class': 'rounded-r-none content-border',
+                            }
+                        }) }}
+                    {% endblock %}
+
+                    {% block button %}
+                        {{ include('_layouts/partials/button.twig', {
+                            tag: 'button',
+                            type: 'button',
+                            color: btnColor,
+                            caption: 'Register'|t('emaillist'),
+                            xOnClick: 'register()',
+                            extraClasses: 'rounded-l-none my-px'
+                        }) }}
+                    {% endblock %}
+
+                </div>
+            {% endblock %}
+
+            {% block privacy %}
+                <div x-show="confirmPrivacy" class="mt-2">
+                    <input id="emaillist-confirmation" type="checkbox" x-model="confirmed">
+                    <label for="emaillist-confirmation">
+                        {{ 'Accept privacy policy'|t('emaillist') }}
+                        {% if privacyLink %}
+                            <br>
+                            <a href="{{ privacyLink }}" class="underline" target="_blank">{{ 'Read here'|t('emaillist') }}</a>
+                        {% endif %}
+                    </label>
+                </div>
+            {% endblock %}
+
+            {% block message %}
+                <div x-show="message"
+                     x-text="message"
+                     x-transition
+                     class="absolute mt-1.5 ml-1.5 top-0 p-2 text-white rounded"
+                     :class="success ? 'bg-green-700' : 'bg-warning '">
+                </div>
+            {% endblock %}
         </div>
     {% endblock %}
 
-    <div class="relative">
-
-        {% block inputs %}
-            <div class="flex">
-                {{ forms.input({
-                    name: 'email',
-                    value: '',
-                    extraAttr: {
-                        'x-model': 'email',
-                        '@keyup.enter': 'register()',
-                        'class': 'rounded-r-none content-border',
-                    }
-                }) }}
-
-                {{ include('_layouts/partials/button.twig', {
-                    tag: 'button',
-                    type: 'button',
-                    color: btnColor,
-                    caption: 'Register'|t('emaillist'),
-                    xOnClick: 'register()',
-                    extraClasses: 'rounded-l-none my-px'
-                }) }}
-
-            </div>
-        {% endblock %}
-
-       {% block privacy %}
-           <div x-show="confirmPrivacy" class="mt-2">
-               <input id="emaillist-confirmation" type="checkbox" x-model="confirmed">
-               <label for="emaillist-confirmation">
-                   {{ 'Accept privacy policy'|t('emaillist') }}
-                   {% if privacyLink %}
-                       <br>
-                       <a href="{{ privacyLink }}" class="underline" target="_blank">{{ 'Read here'|t('emaillist') }}</a>
-                   {% endif %}
-               </label>
-           </div>
-       {% endblock %}
-
-        {% block message %}
-            <div x-show="message"
-                 x-text="message"
-                 x-transition
-                 class="absolute mt-1.5 ml-1.5 top-0 p-2 text-white rounded"
-                 :class="success ? 'bg-green-700' : 'bg-warning '">
-            </div>
-        {% endblock %}
-    </div>
-</div>
+</div> <!-- end component -->
