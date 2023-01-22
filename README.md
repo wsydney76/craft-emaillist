@@ -195,6 +195,10 @@ $emails = EmaillistRecord::find()
     ->collect();
 ```
 
+## Widget
+
+Emaillist widgets shows numbers of active registrations.
+
 ## Todos
 
 * Better customization for texts (confirmations emails).

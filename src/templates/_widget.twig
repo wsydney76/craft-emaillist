@@ -1,0 +1,16 @@
+{# var labels, counts #}
+<p>
+    {{ 'Active Registrations'|t('emaillist') }}:
+</p>
+<table class="table data">
+    {% for count in counts %}
+    	<tr>
+            <td>
+                {{ labels[count.list] ?? count.list }}
+            </td>
+            <td>
+                {{ count.count }}
+            </td>
+        </tr>
+    {% endfor %}
+</table>

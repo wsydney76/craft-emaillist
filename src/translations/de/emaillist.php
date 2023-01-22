@@ -5,7 +5,7 @@ return [
     'Register Email' => 'E-Mail registrieren',
     'Your email is removed from the list.' => 'Ihre E-Mail wurde von der Liste entfernt.',
     'This is not a valid email address!' => 'Das ist keine gültige E-Mail-Adresse!',
-    'Email List' => 'Email List',
+    'Email List' => 'E-Mail Listen',
     'Please confirm' => 'Please confirm',
     'In order to unregister your email, click here' => 'Um Ihre E-Mail-Registrierung zu löschen, klicken Sie hier',
     'Email {email} registered.' => 'E-Mail {email} registriert.',
@@ -48,4 +48,5 @@ return [
     'Delete email registrations' => 'E-Mail-Registrierungen löschen',
     'Delete email registration' => 'E-Mail-Registrierung löschen',
     'Save and register another email' => 'Speichern und eine weitere E-Mail registrieren',
+    'Active Registrations' => 'Aktive Registrierungen',
 ];

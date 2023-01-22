@@ -3,24 +3,26 @@
 namespace wsydney76\emaillist;
 
 use Craft;
-use craft\events\DefineBehaviorsEvent;
-use craft\services\Gc;
-use craft\web\twig\variables\CraftVariable;
-use wsydney76\emaillist\behaviors\CraftVariableBehavior;
-use wsydney76\emaillist\records\EmaillistRecord;
 use function array_merge;
 use craft\base\Model;
 use craft\base\Plugin as BasePlugin;
+use craft\events\DefineBehaviorsEvent;
 use craft\events\RegisterComponentTypesEvent;
 use craft\events\RegisterTemplateRootsEvent;
 use craft\events\RegisterUrlRulesEvent;
+use craft\services\Dashboard;
+use craft\services\Gc;
 use craft\services\Utilities;
 use craft\web\UrlManager;
 use craft\web\View;
+use craft\web\twig\variables\CraftVariable;
+use wsydney76\emaillist\behaviors\CraftVariableBehavior;
 use wsydney76\emaillist\models\Settings;
+use wsydney76\emaillist\records\EmaillistRecord;
 use wsydney76\emaillist\services\EmaillistService;
 use wsydney76\emaillist\utilities\EmaillistUtility;
 use wsydney76\emaillist\utilities\RegisterEmailUtility;
+use wsydney76\emaillist\widgets\EmaillistWidget;
 use yii\base\Event;
 
 /**
@@ -88,7 +90,17 @@ class Plugin extends BasePlugin
             function(RegisterUrlRulesEvent $event) {
                 $event->rules = array_merge($event->rules, [
                     'emaillist/register' => 'emaillist/emaillist/register',
-                    'emaillist/unregister' => 'emaillist/emaillist/unregister'
+                    'emaillist/unregister' => 'emaillist/emaillist/unregister',
+                ]);
+            }
+        );
+
+        Event::on(
+            UrlManager::class,
+            UrlManager::EVENT_REGISTER_CP_URL_RULES,
+            function(RegisterUrlRulesEvent $event) {
+                $event->rules = array_merge($event->rules, [
+                    'emaillist' => ['template' => 'emaillist/_index']
                 ]);
             }
         );
@@ -99,7 +111,6 @@ class Plugin extends BasePlugin
             UrlManager::EVENT_REGISTER_CP_URL_RULES, function(RegisterUrlRulesEvent $event): void {
             $event->rules['emaillist/<id:[\d]+>'] = 'emaillist/emaillist/cp-edit';
             $event->rules['emaillist/new'] = 'emaillist/emaillist/cp-edit';
-
         });
 
         Event::on(
@@ -109,5 +120,11 @@ class Plugin extends BasePlugin
                 $event->behaviors[] = CraftVariableBehavior::class;
             }
         );
+        Event::on(
+            Dashboard::class,
+            Dashboard::EVENT_REGISTER_WIDGET_TYPES,
+            function(RegisterComponentTypesEvent $event) {
+                $event->types[] = EmaillistWidget::class;
+            });
     }
 }
