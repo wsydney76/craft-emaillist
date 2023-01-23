@@ -3,27 +3,21 @@
 namespace wsydney76\emaillist;
 
 use Craft;
-use function array_merge;
-use craft\base\Model;
 use craft\base\Plugin as BasePlugin;
 use craft\events\DefineBehaviorsEvent;
 use craft\events\RegisterComponentTypesEvent;
 use craft\events\RegisterTemplateRootsEvent;
 use craft\events\RegisterUrlRulesEvent;
 use craft\services\Dashboard;
-use craft\services\Gc;
-use craft\services\Utilities;
+use craft\web\twig\variables\CraftVariable;
 use craft\web\UrlManager;
 use craft\web\View;
-use craft\web\twig\variables\CraftVariable;
 use wsydney76\emaillist\behaviors\CraftVariableBehavior;
 use wsydney76\emaillist\models\Settings;
-use wsydney76\emaillist\records\EmaillistRecord;
 use wsydney76\emaillist\services\EmaillistService;
-use wsydney76\emaillist\utilities\EmaillistUtility;
-use wsydney76\emaillist\utilities\RegisterEmailUtility;
 use wsydney76\emaillist\widgets\EmaillistWidget;
 use yii\base\Event;
+use function array_merge;
 
 /**
  * Register Email plugin
@@ -34,6 +28,7 @@ use yii\base\Event;
  * @copyright wsydney76
  * @license MIT
  * @property-read EmaillistService $emaillist
+ * @property-read BaseMigrationService $baseMigrationService
  */
 class Plugin extends BasePlugin
 {
