@@ -140,7 +140,8 @@
                      x-text="message"
                      x-transition
                      class="absolute mt-1.5 ml-1.5 top-0 p-2 text-white rounded"
-                     :class="success ? 'bg-green-700' : 'bg-warning '">
+                     style="margin-top: 6px;" {# class mt-1.5 not working??? #}
+                     :class="success ? 'bg-green-700' : 'bg-warning'">
                 </div>
             {% endblock %}
         </div>

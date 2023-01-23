@@ -4,7 +4,7 @@ namespace wsydney76\emaillist\migrations;
 
 use Craft;
 use craft\db\Migration;
-use wsydney76\emaillist\records\EmaillistRecord;
+use wsydney76\emaillist\records\RegistrationRecord;
 
 /**
  * Install migration.
@@ -16,7 +16,7 @@ class Install extends Migration
      */
     public function safeUp(): bool
     {
-        $this->createTable(EmaillistRecord::tableName(), [
+        $this->createTable(RegistrationRecord::tableName(), [
             'id' => $this->primaryKey(),
             'email' => $this->string(255)->notNull(),
             'verificationCode' => $this->string(255)->notNull(),
@@ -36,7 +36,7 @@ class Install extends Migration
      */
     public function safeDown(): bool
     {
-        $this->dropTableIfExists(EmaillistRecord::tableName());
+        $this->dropTableIfExists(RegistrationRecord::tableName());
 
         return true;
     }

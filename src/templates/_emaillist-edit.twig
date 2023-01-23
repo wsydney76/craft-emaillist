@@ -2,7 +2,7 @@
 {% import '_includes/forms.twig' as forms %}
 
 
-{{ hiddenInput('id', emaillist.id) }}
+{{ hiddenInput('id', registration.id) }}
 
 <div id="fields">
     <div class="flex-fields">
@@ -11,14 +11,14 @@
             type: 'email',
             name: 'email',
             required: true,
-            value: emaillist.email,
-            errors: emaillist.errors('email'),
+            value: registration.email,
+            errors: registration.errors('email'),
         }) }}
 
         {% set lists = collect(settings.lists) %}
 
-        {% if emaillist.list and lists.doesntContain('value', emaillist.list) %}
-            {% do lists.push({label: "#{emaillist.list|ucfirst} (not configured)", value: emaillist.list}) %}
+        {% if registration.list and lists.doesntContain('value', registration.list) %}
+            {% do lists.push({label: "#{registration.list|ucfirst} (not configured)", value: registration.list}) %}
         {% endif %}
 
 
@@ -27,8 +27,8 @@
             type: 'text',
             name: 'list',
             required: true,
-            value: emaillist.list,
-            errors: emaillist.errors('list'),
+            value: registration.list,
+            errors: registration.errors('list'),
             options: lists
         }) }}
 
@@ -36,7 +36,7 @@
         {{ forms.selectField({
             label: 'Site'|t('emaillist'),
             name: 'site',
-            value: emaillist.site,
+            value: registration.site,
             required: true,
             options: craft.app.sites.allSites|map(site => {label: site.name, value: site.handle}),
         }) }}
@@ -44,7 +44,7 @@
         {{ forms.lightswitchField({
             label: 'Active'|t('emaillist'),
             name: 'active',
-            on: emaillist.isNewRecord ? true :  emaillist.active
+            on: registration.isNewRecord ? true :  registration.active
         }) }}
 
     </div>

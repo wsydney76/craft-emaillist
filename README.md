@@ -187,9 +187,9 @@ Event::on(
 ## Retrieve Registrations
 
 ```php
-use wsydney76\emaillist\records\EmaillistRecord;
+use wsydney76\emaillist\records\RegistrationRecord;
 
-$emails = EmaillistRecord::find()
+$emails = RegistrationRecord::find()
     ->orderBy('email')
     ->where(['list' => 'newsletter'])
     ->collect();

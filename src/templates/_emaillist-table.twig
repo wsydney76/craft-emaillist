@@ -24,7 +24,7 @@
             label: 'By List'|t('emaillist'),
             id: 'listSelect',
             options:
-            craft.emaillist.select('list').distinct().orderBy('list').column
+            craft.registrations.select('list').distinct().orderBy('list').column
             |map(list => {label: list, value: list})
             |unshift({label: 'All'|t('emaillist'), value: ''})
 
@@ -34,7 +34,7 @@
             {{ forms.selectField({
                 label: 'By Email'|t('emaillist'),
                 id: 'emailSelect',
-                options: craft.emaillist.select('email').distinct().orderBy('email').column
+                options: craft.registrations.select('email').distinct().orderBy('email').column
                 |map(email => {label:email, value:email})
                 |unshift({label: 'All'|t('emaillist'), value: ''}),
                 first:true
@@ -64,7 +64,7 @@ buttons = [
     {
         label: Craft.t('emaillist', 'Add'),
         icon: 'plus',
-        href: '{{ cpUrl('emaillist/new') }}',
+        href: '{{ cpUrl('registration/new') }}',
 
     },
 ]

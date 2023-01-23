@@ -13,7 +13,7 @@ use function strtolower;
  * @property string $verificationCode
  * @property string $site
  */
-class EmaillistRecord extends ActiveRecord
+class RegistrationRecord extends ActiveRecord
 {
 
     public static function tableName()

@@ -3,21 +3,21 @@
     <div class="data">
         <h3 class="heading">ID:</h3>
         <div class="value">
-            {{ emaillist.isNewRecord ? 'New'|t('emaillist') : emaillist.id }}
+            {{ registration.isNewRecord ? 'New'|t('emaillist') : registration.id }}
         </div>
     </div>
 
-    {% if not emaillist.isNewRecord %}
+    {% if not registration.isNewRecord %}
         <div class="data">
             <h3 class="heading">{{ 'Created at'|t('emaillist') }}:</h3>
             <div class="value">
-                {{ craft.app.formatter.asDatetime(emaillist.dateCreated) }}
+                {{ craft.app.formatter.asDatetime(registration.dateCreated) }}
             </div>
         </div>
         <div class="data">
             <h3 class="heading">{{ 'Updated at'|t('emaillist') }}:</h3>
             <div class="value">
-                {{ craft.app.formatter.asDatetime(emaillist.dateUpdated) }}
+                {{ craft.app.formatter.asDatetime(registration.dateUpdated) }}
             </div>
         </div>
     {% endif %}

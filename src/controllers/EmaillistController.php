@@ -7,15 +7,12 @@ use craft\helpers\AdminTable;
 use craft\helpers\UrlHelper;
 use craft\web\Controller;
 use craft\web\View;
-use Stringy\Stringy;
 use wsydney76\emaillist\events\EmaillistRegisterEvent;
 use wsydney76\emaillist\Plugin;
-use wsydney76\emaillist\records\EmaillistRecord;
+use wsydney76\emaillist\records\RegistrationRecord;
 use wsydney76\emaillist\services\EmaillistService;
-use yii\debug\components\search\matchers\GreaterThanOrEqual;
 use yii\web\NotFoundHttpException;
 use yii\web\Response;
-use function key_exists;
 use function str_replace;
 use function ucfirst;
 
@@ -69,13 +66,13 @@ class EmaillistController extends Controller
             }
         }
 
-        $record = $this->service->createEmaillistEntry($email, $list, Craft::$app->sites->currentSite->handle);
+        $registration = $this->service->createEmaillistEntry($email, $list, Craft::$app->sites->currentSite->handle);
 
-        if ($record->hasErrors()) {
+        if ($registration->hasErrors()) {
             return $this->asJson([
                 'success' => false,
-                'message' => $record->getFirstError('email'),
-                'email' => $record->email
+                'message' => $registration->getFirstError('email'),
+                'email' => $registration->email
             ]);
         }
 
@@ -84,8 +81,8 @@ class EmaillistController extends Controller
             'message' => Craft::t(
                 'emaillist',
                 'Email {email} registered.',
-                ['email' => $record->email]),
-            'email' => $record->email
+                ['email' => $registration->email]),
+            'email' => $registration->email
         ]);
     }
 
@@ -108,37 +105,37 @@ class EmaillistController extends Controller
     {
         $this->requirePermission('accessplugin-emaillist');
 
-        $record = null;
+        $registration = null;
 
         // Failed save
-        if (array_key_exists('emaillist', Craft::$app->urlManager->getRouteParams())) {
-            $record = Craft::$app->urlManager->getRouteParams()['emaillist'];
+        if (array_key_exists('registration', Craft::$app->urlManager->getRouteParams())) {
+            $registration = Craft::$app->urlManager->getRouteParams()['registration'];
         }
 
-        if (!$record) {
-            $record = $id ? EmaillistRecord::findOne($id) : new EmaillistRecord();
+        if (!$registration) {
+            $registration = $id ? RegistrationRecord::findOne($id) : new RegistrationRecord();
         }
 
-        if (!$record) {
+        if (!$registration) {
             throw new NotFoundHttpException();
         }
 
         $buttons = [
             [
                 'label' => Craft::t('app', 'Save and continue editing'),
-                'redirect' => 'emaillist/{id}',
+                'redirect' => 'registration/{id}',
                 'shortcut' => true,
                 'retainScroll' => true,
             ],
             [
                 'label' => Craft::t('emaillist', 'Save and register another email'),
-                'redirect' => 'emaillist/new',
+                'redirect' => 'registration/new',
                 'shortcut' => true,
                 'shift' => true,
             ]
         ];
 
-        if (!$record->isNewRecord) {
+        if (!$registration->isNewRecord) {
             $buttons[] = [
                 'label' => Craft::t('emaillist', 'Delete email registration'),
                 'redirect' => 'emaillist',
@@ -148,7 +145,7 @@ class EmaillistController extends Controller
             ];
         }
 
-        $title = $record->isNewRecord ?
+        $title = $registration->isNewRecord ?
             Craft::t('emaillist', 'Create new Email Registration') :
             Craft::t('emaillist', 'Edit Email Registration');
 
@@ -163,10 +160,10 @@ class EmaillistController extends Controller
             ->altActions($buttons)
             ->contentTemplate('emaillist/_emaillist-edit.twig', [
                 'settings' => Plugin::getInstance()->getSettings(),
-                'emaillist' => $record
+                'registration' => $registration
             ])
             ->sidebarTemplate('emaillist/_emaillist-sidebar.twig', [
-                'emaillist' => $record
+                'registration' => $registration
             ]);
     }
 
@@ -181,33 +178,33 @@ class EmaillistController extends Controller
         $site = Craft::$app->request->getRequiredBodyParam('site');
         $active = Craft::$app->request->getRequiredBodyParam('active');
 
-        $record = $id ? EmaillistRecord::findOne($id) : new EmaillistRecord();
+        $registration = $id ? RegistrationRecord::findOne($id) : new RegistrationRecord();
 
-        if (!$record) {
+        if (!$registration) {
             throw new NotFoundHttpException();
         }
 
-        $record->setAttributes([
+        $registration->setAttributes([
             'email' => $email,
             'list' => $list ?? 'default',
             'site' => $site,
         ]);
 
-        $record->active = $active ? 1 : 0;
+        $registration->active = $active ? 1 : 0;
 
-        $record->save();
+        $registration->save();
 
-        if ($record->hasErrors()) {
+        if ($registration->hasErrors()) {
             return $this->asModelFailure(
-                $record,
+                $registration,
                 Craft::t('emaillist', 'Could not save email registration.'),
-                'emaillist');
+                'registration');
         }
 
         return $this->asModelSuccess(
-            $record,
+            $registration,
             Craft::t('emaillist', 'Email registration saved.'),
-            'emaillist');
+            'registration');
     }
 
     public function actionCpUnregister()
@@ -223,9 +220,9 @@ class EmaillistController extends Controller
 
         $id = Craft::$app->request->getRequiredBodyParam('id');
 
-        $record = EmaillistRecord::findOne($id);
-        if ($record) {
-            $record->delete();
+        $registration = RegistrationRecord::findOne($id);
+        if ($registration) {
+            $registration->delete();
         }
 
         return $this->asSuccess('Selected emails deleted.');
@@ -235,15 +232,15 @@ class EmaillistController extends Controller
     {
         $this->requirePermission('accessplugin-emaillist');
 
-        $emails = EmaillistRecord::find()
+        $registrations = RegistrationRecord::find()
             ->orderBy('email')
             ->collect();
 
-        if (!$emails->count()) {
+        if (!$registrations->count()) {
             return $this->asFailure('Nothing found.');
         }
 
-        $csvOutput = $this->service->createCsvOutput($emails);
+        $csvOutput = $this->service->createCsvOutput($registrations);
 
         return $this->response->sendContentAsFile($csvOutput, 'emails.csv', []);
     }
@@ -262,7 +259,7 @@ class EmaillistController extends Controller
         $orderBy = $request->getParam('sort') ?: 'dateCreated desc';
         $orderBy = str_replace('|', ' ', $orderBy);
 
-        $query = EmaillistRecord::find();
+        $query = RegistrationRecord::find();
 
         foreach (['list', 'email'] as $param) {
             $value = $request->getParam($param);
@@ -279,14 +276,14 @@ class EmaillistController extends Controller
         $pagination = AdminTable::paginationLinks($page, $count, $limit);
 
         $offset = ($page - 1) * $limit;
-        $emails = $query->orderBy($orderBy)->offset($offset)->limit($limit)->collect();
+        $registrations = $query->orderBy($orderBy)->offset($offset)->limit($limit)->collect();
 
         $lists = collect($settings->lists);
 
-        $data = $emails->map(fn($email) => [
+        $data = $registrations->map(fn($email) => [
             'id' => $email->id,
             'title' => $email->email,
-            'url' => UrlHelper::cpUrl("emaillist/{$email->id}"),
+            'url' => UrlHelper::cpUrl("registration/{$email->id}"),
             'status' => $email->active,
             'list' => $lists->firstWhere('value', $email->list)['label'] ?? ucfirst($email->list),
             'site' => Craft::$app->sites->getSiteByHandle($email->site)->name,

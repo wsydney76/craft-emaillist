@@ -5,7 +5,7 @@ namespace wsydney76\emaillist\jobs;
 use Craft;
 use craft\queue\BaseJob;
 use wsydney76\emaillist\Plugin;
-use wsydney76\emaillist\records\EmaillistRecord;
+use wsydney76\emaillist\records\RegistrationRecord;
 
 /**
  * Send Notification queue job
@@ -19,7 +19,7 @@ class SendNotification extends BaseJob
      */
     function execute($queue): void
     {
-        $record = EmaillistRecord::findOne($this->id);
+        $record = RegistrationRecord::findOne($this->id);
 
         if (!$record)
             return;

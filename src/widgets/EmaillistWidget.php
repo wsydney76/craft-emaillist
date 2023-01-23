@@ -6,7 +6,7 @@ use Craft;
 use craft\base\Widget;
 use craft\helpers\App;
 use wsydney76\emaillist\Plugin;
-use wsydney76\emaillist\records\EmaillistRecord;
+use wsydney76\emaillist\records\RegistrationRecord;
 
 /**
  * Emaillist Widget widget type
@@ -30,7 +30,7 @@ class EmaillistWidget extends Widget
 
     public function getBodyHtml(): ?string
     {
-        $counts = EmaillistRecord::find()
+        $counts = RegistrationRecord::find()
             ->groupBy('list')
             ->orderBy('list')
             ->where(['active' => 1])
