@@ -101,23 +101,19 @@ class EmaillistController extends Controller
     }
 
 
-    public function actionCpEdit($id = null)
+    public function actionCpEdit($id = null, ?RegistrationRecord $registration = null)
     {
         $this->requirePermission('accessplugin-emaillist');
 
-        $registration = null;
-
-        // Failed save
-        if (array_key_exists('registration', Craft::$app->urlManager->getRouteParams())) {
-            $registration = Craft::$app->urlManager->getRouteParams()['registration'];
-        }
-
         if (!$registration) {
-            $registration = $id ? RegistrationRecord::findOne($id) : new RegistrationRecord();
-        }
-
-        if (!$registration) {
-            throw new NotFoundHttpException();
+            if ($id) {
+                $registration = RegistrationRecord::findOne($id);
+                if (!$registration) {
+                    throw new NotFoundHttpException();
+                }
+            } else {
+                $registration =  new RegistrationRecord();
+            }
         }
 
         $buttons = [
