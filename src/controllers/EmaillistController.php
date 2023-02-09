@@ -13,8 +13,10 @@ use wsydney76\emaillist\records\RegistrationRecord;
 use wsydney76\emaillist\services\EmaillistService;
 use yii\web\NotFoundHttpException;
 use yii\web\Response;
+use function extract;
 use function str_replace;
 use function ucfirst;
+use const EXTR_OVERWRITE;
 
 /**
  * Register Email controller
@@ -167,12 +169,9 @@ class EmaillistController extends Controller
     {
         $this->requirePermission('accessplugin-emaillist');
 
+        $params = Craft::$app->request->getRequiredBodyParam('registration');
 
-        $id = Craft::$app->request->getRequiredBodyParam('id');
-        $email = Craft::$app->request->getRequiredBodyParam('email');
-        $list = Craft::$app->request->getRequiredBodyParam('list');
-        $site = Craft::$app->request->getRequiredBodyParam('site');
-        $active = Craft::$app->request->getRequiredBodyParam('active');
+        extract($params, EXTR_OVERWRITE);
 
         $registration = $id ? RegistrationRecord::findOne($id) : new RegistrationRecord();
 
@@ -182,7 +181,7 @@ class EmaillistController extends Controller
 
         $registration->setAttributes([
             'email' => $email,
-            'list' => $list ?? 'default',
+            'list' => $list,
             'site' => $site,
         ]);
 
