@@ -1,4 +1,4 @@
-{% import '_macros/forms.twig' as forms %}
+{% import '_layouts/macros/forms.twig' as forms %}
 
 {% set btnColor = btnColor ?? 'primary' %}
 {% set confirmPrivacy = confirmPrivacy is defined ? confirmPrivacy : true %}
@@ -141,7 +141,7 @@
                      x-transition
                      class="absolute mt-1.5 ml-1.5 top-0 p-2 text-white rounded"
                      style="margin-top: 6px;" {# class mt-1.5 not working??? #}
-                     :class="success ? 'bg-green-700' : 'bg-warning'">
+                     :class="success ? 'bg-success' : 'bg-warning'">
                 </div>
             {% endblock %}
         </div>

@@ -129,7 +129,7 @@ Set up your own template that extends the plugins component and pull in/overwrit
                      x-text="message"
                      x-transition
                      class="my-1.5 p-2 text-white rounded"
-                     :class="success ? 'bg-green-700' : 'bg-warning '">
+                     :class="success ? 'bg-success' : 'bg-warning '">
                 </div>
                 
                 {# Your own privacy text #}
