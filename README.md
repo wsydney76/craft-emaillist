@@ -42,7 +42,7 @@ cd /path/to/my-project.test
 composer require wsydney76/craft-emaillist
 
 # tell Craft to install the plugin
-./craft plugin/install emaillist
+craft plugin/install emaillist
 ```
 
 ## CSS
